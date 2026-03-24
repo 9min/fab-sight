@@ -1,4 +1,4 @@
-import type { ProcessDataPoint, Recipe, SensorMeta } from "@/types/process";
+import type { ProcessDataPoint, Recipe, SensorMeta, WaferRun } from "@/types/process";
 import type { XAxisMode } from "@/utils/downsample";
 import ReactECharts from "echarts-for-react";
 import { memo, useMemo } from "react";
@@ -7,6 +7,7 @@ import { buildChartOption } from "./buildChartOption";
 import { buildGoldenLotOverlay } from "./buildGoldenLotOverlay";
 import { buildRecipeStepOverlay } from "./buildRecipeStepOverlay";
 import { buildSpecLimitOverlay } from "./buildSpecLimitOverlay";
+import { buildWaferCompareOverlay } from "./buildWaferCompareOverlay";
 
 interface TimeSeriesChartProps {
 	data: ProcessDataPoint[];
@@ -16,6 +17,9 @@ interface TimeSeriesChartProps {
 	showSpecLimits?: boolean;
 	goldenData?: ProcessDataPoint[];
 	isCompareMode?: boolean;
+	wafers?: WaferRun[];
+	currentWaferId?: string;
+	isWaferCompareMode?: boolean;
 	recipe?: Recipe;
 	xAxisMode?: XAxisMode;
 	waferStartTime?: string;
@@ -30,6 +34,9 @@ export const TimeSeriesChart = memo(function TimeSeriesChart({
 	showSpecLimits = false,
 	goldenData,
 	isCompareMode = false,
+	wafers,
+	currentWaferId,
+	isWaferCompareMode = false,
 	recipe,
 	xAxisMode = "wallClock",
 	waferStartTime,
@@ -48,6 +55,14 @@ export const TimeSeriesChart = memo(function TimeSeriesChart({
 		);
 		const stepSeries = buildRecipeStepOverlay(recipe, xAxisMode, waferStartTime);
 		const specSeries = buildSpecLimitOverlay(selectedSensors, sensorsMeta, showSpecLimits);
+		const w2wSeries = buildWaferCompareOverlay(
+			wafers ?? [],
+			selectedSensors,
+			sensorsMeta,
+			currentWaferId ?? "",
+			isWaferCompareMode,
+			xAxisMode,
+		);
 
 		const baseSeries = Array.isArray(baseOption.series) ? baseOption.series : [];
 		const allSeries = [
@@ -56,6 +71,7 @@ export const TimeSeriesChart = memo(function TimeSeriesChart({
 			...goldenSeries,
 			...stepSeries,
 			...specSeries,
+			...w2wSeries,
 		];
 
 		return { ...baseOption, series: allSeries };
@@ -67,6 +83,9 @@ export const TimeSeriesChart = memo(function TimeSeriesChart({
 		showSpecLimits,
 		goldenData,
 		isCompareMode,
+		wafers,
+		currentWaferId,
+		isWaferCompareMode,
 		recipe,
 		xAxisMode,
 		waferStartTime,

@@ -16,6 +16,7 @@ export function DashboardPage() {
 	const showAnomalyOverlay = useDashboardStore((s) => s.showAnomalyOverlay);
 	const showSpecLimits = useDashboardStore((s) => s.showSpecLimits);
 	const isCompareMode = useDashboardStore((s) => s.isCompareMode);
+	const isWaferCompareMode = useDashboardStore((s) => s.isWaferCompareMode);
 	const xAxisMode = useDashboardStore((s) => s.xAxisMode);
 	const setSelectedLot = useDashboardStore((s) => s.setSelectedLot);
 	const setSelectedWafer = useDashboardStore((s) => s.setSelectedWafer);
@@ -101,6 +102,9 @@ export function DashboardPage() {
 				showSpecLimits={showSpecLimits}
 				goldenData={goldenWaferData}
 				isCompareMode={isCompareMode}
+				wafers={lotData.wafers}
+				currentWaferId={selectedWaferId ?? undefined}
+				isWaferCompareMode={isWaferCompareMode}
 				recipe={recipe}
 				xAxisMode={xAxisMode}
 				waferStartTime={waferData.startTime}
