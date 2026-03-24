@@ -1,10 +1,13 @@
 import { DrilldownPanel } from "@/components/drilldown/DrilldownPanel";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AnomalyToggle } from "@/components/ui/AnomalyToggle";
+import { ChamberSelector } from "@/components/ui/ChamberSelector";
 import { CompareToggle } from "@/components/ui/CompareToggle";
+import { EquipmentSelector } from "@/components/ui/EquipmentSelector";
 import { LotSelector } from "@/components/ui/LotSelector";
 import { SensorCheckboxGroup } from "@/components/ui/SensorCheckbox";
 import { SpecLimitToggle } from "@/components/ui/SpecLimitToggle";
+import { WaferCompareToggle } from "@/components/ui/WaferCompareToggle";
 import { WaferSelector } from "@/components/ui/WaferSelector";
 import { XAxisModeToggle } from "@/components/ui/XAxisModeToggle";
 import { getSensorsForProcess } from "@/constants/sensorConfig";
@@ -31,6 +34,8 @@ function AppContent() {
 		<DashboardLayout
 			navControls={
 				<>
+					<EquipmentSelector />
+					<ChamberSelector />
 					<LotSelector />
 					<WaferSelector />
 					<CompareToggle />
@@ -56,6 +61,7 @@ function AppContent() {
 						</h2>
 						<div className="flex flex-col gap-2">
 							<SpecLimitToggle />
+							<WaferCompareToggle />
 							<XAxisModeToggle />
 						</div>
 					</div>

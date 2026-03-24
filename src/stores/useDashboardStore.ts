@@ -9,6 +9,7 @@ interface DashboardState {
 	selectedWaferId: string | null;
 	selectedSensors: string[];
 	isCompareMode: boolean;
+	isWaferCompareMode: boolean;
 	showAnomalyOverlay: boolean;
 	showSpecLimits: boolean;
 	xAxisMode: XAxisMode;
@@ -20,6 +21,7 @@ interface DashboardState {
 	setSelectedWafer: (waferId: string | null) => void;
 	setSelectedSensors: (sensors: string[]) => void;
 	toggleCompareMode: () => void;
+	toggleWaferCompareMode: () => void;
 	toggleAnomalyOverlay: () => void;
 	toggleSpecLimits: () => void;
 	setXAxisMode: (mode: XAxisMode) => void;
@@ -33,6 +35,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 	selectedWaferId: null,
 	selectedSensors: ["temperature", "pressure", "rfPower"],
 	isCompareMode: false,
+	isWaferCompareMode: false,
 	showAnomalyOverlay: true,
 	showSpecLimits: false,
 	xAxisMode: "wallClock",
@@ -52,6 +55,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 	setSelectedWafer: (waferId) => set({ selectedWaferId: waferId, selectedTimestamp: null }),
 	setSelectedSensors: (sensors) => set({ selectedSensors: sensors }),
 	toggleCompareMode: () => set((state) => ({ isCompareMode: !state.isCompareMode })),
+	toggleWaferCompareMode: () => set((state) => ({ isWaferCompareMode: !state.isWaferCompareMode })),
 	toggleAnomalyOverlay: () => set((state) => ({ showAnomalyOverlay: !state.showAnomalyOverlay })),
 	toggleSpecLimits: () => set((state) => ({ showSpecLimits: !state.showSpecLimits })),
 	setXAxisMode: (mode) => set({ xAxisMode: mode }),
