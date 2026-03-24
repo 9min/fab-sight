@@ -271,7 +271,7 @@ export function useTodoRealtimeSync() {
 }
 ```
 
-## Amfibian Lite 상태 관리 구조
+## FabSight 상태 관리 구조
 
 ### Zustand 스토어 (클라이언트 상태)
 

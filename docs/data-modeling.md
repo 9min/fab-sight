@@ -228,7 +228,7 @@ type CreateTodoInput = Database["public"]["Tables"]["todos"]["Insert"];
 type UpdateTodoInput = Database["public"]["Tables"]["todos"]["Update"];
 ```
 
-## Amfibian Lite 데이터 모델
+## FabSight 데이터 모델
 
 ### MVP 단계: Mock 데이터 사용
 

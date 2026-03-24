@@ -1,4 +1,4 @@
-# PRD - Amfibian Lite
+# PRD - FabSight
 
 ## 1. 프로젝트 개요
 
