@@ -361,21 +361,55 @@ interface Toast {
 
 ### 차트 센서별 색상
 
-| 센서 | 색상 | Tailwind |
-|------|------|----------|
-| Temperature | `#EF4444` | `red-500` |
-| Pressure | `#3B82F6` | `blue-500` |
-| RF Power | `#F59E0B` | `amber-500` |
-| Golden Lot (비교) | `#6B7280` | `gray-500`, 점선 |
+센서 수가 공정별로 다르므로 카테고리별 색상 체계를 사용한다.
+
+| 카테고리 | 센서 | 색상 | Tailwind |
+|----------|------|------|----------|
+| 온도 계열 | Temperature | `#EF4444` | `red-500` |
+| 온도 계열 | ESC Temperature | `#F97316` | `orange-500` |
+| 압력 계열 | Pressure | `#3B82F6` | `blue-500` |
+| 압력 계열 | DC Bias | `#06B6D4` | `cyan-500` |
+| RF 계열 | RF Power / Source Power | `#F59E0B` | `amber-500` |
+| RF 계열 | Bias Power | `#A855F7` | `purple-500` |
+| RF 계열 | RF Reflected | `#EC4899` | `pink-500` |
+| 가스 계열 | SiH4 Flow | `#22C55E` | `green-500` |
+| 가스 계열 | NH3 / N2 Flow | `#10B981` | `emerald-500` |
+| 가스 계열 | CF4 / CHF3 Flow | `#14B8A6` | `teal-500` |
+| 가스 계열 | Ar / O2 Flow | `#84CC16` | `lime-500` |
+| 기타 | Spacing / Deposition Rate | `#78716C` | `stone-500` |
+| 비교 | Golden Lot (비교) | `#6B7280` | `gray-500`, 점선 |
+
+### Spec Limit 표시 색상
+
+| 요소 | 색상 | 스타일 |
+|------|------|--------|
+| USL / LSL (Spec Limit) | `#DC2626` | 빨간 점선, lineWidth: 1 |
+| UCL / LCL (Control Limit) | `#F59E0B` | 노란 점선, lineWidth: 1 |
+
+### 레시피 스텝 경계선
+
+| 요소 | 색상 | 스타일 |
+|------|------|--------|
+| 스텝 경계 수직선 | `rgba(148, 163, 184, 0.3)` | 회색 대시선 |
+| 스텝 이름 라벨 | `#94A3B8` | 상단에 텍스트 표시 |
 
 ### 이상 탐지 시각화 색상
 
 | 요소 | 색상 | 설명 |
 |------|------|------|
-| 정상 범위 (Confidence Band) | `rgba(34, 197, 94, 0.1)` | 옅은 초록 배경 |
 | 이상 포인트 마커 | `#EF4444` | 붉은색 원형 마커 |
 | 이상 점수 높음 (>0.8) | `#DC2626` | 강한 빨강 |
 | 이상 점수 중간 (0.5~0.8) | `#F59E0B` | 경고 노랑 |
+
+### 이상 유형별 마커
+
+| 이상 유형 | 마커 형태 | 색상 |
+|-----------|----------|------|
+| Drift | 삼각형 (▲) | `#F59E0B` (amber) |
+| Spike | 번개 모양 (⚡) | `#DC2626` (red) |
+| Shift | 계단 모양 (⊏) | `#8B5CF6` (violet) |
+| Oscillation | 파형 (~) | `#06B6D4` (cyan) |
+| Out-of-Range | 원형 (●) | `#DC2626` (red) |
 
 ## 관련 문서
 

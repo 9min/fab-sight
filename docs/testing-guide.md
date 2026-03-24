@@ -130,20 +130,39 @@ describe("TodoService 보안", () => {
 
 ### 파일 위치
 
-테스트 파일은 `tests/` 디렉토리에 소스 구조를 미러링하여 배치한다.
+테스트 파일은 소스 파일과 같은 디렉토리에 **co-located** 배치한다. 차트 빌더, 유틸리티 함수 등 테스트 대상과 테스트를 가까이 두면 탐색과 유지보수가 편리하다.
 
 ```
 프로젝트-루트/
 ├── src/
-│   ├── components/LoginForm.tsx
-│   ├── hooks/useAuth.ts
-│   └── services/authService.ts
-├── tests/
-│   ├── components/LoginForm.test.tsx
-│   ├── hooks/useAuth.test.ts
-│   └── services/authService.test.ts
+│   ├── components/
+│   │   ├── charts/
+│   │   │   ├── buildChartOption.ts
+│   │   │   ├── buildChartOption.test.ts    ← 같은 디렉토리
+│   │   │   ├── TimeSeriesChart.tsx
+│   │   │   └── ...
+│   │   ├── layout/
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── Sidebar.test.tsx
+│   │   │   └── ...
+│   │   └── drilldown/
+│   │       ├── DrilldownPanel.tsx
+│   │       ├── DrilldownPanel.test.tsx
+│   │       └── ...
+│   ├── mocks/
+│   │   ├── generateProcessData.ts
+│   │   ├── generateProcessData.test.ts
+│   │   └── ...
+│   ├── services/
+│   │   ├── processDataService.ts
+│   │   ├── processDataService.test.ts
+│   │   └── ...
+│   └── utils/
+│       ├── downsample.ts
+│       ├── downsample.test.ts
+│       └── ...
 └── e2e/
-    └── auth.e2e.spec.ts
+    └── dashboard.e2e.spec.ts
 ```
 
 ### 파일 네이밍

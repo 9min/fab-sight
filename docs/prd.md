@@ -13,17 +13,21 @@
 
 ## 3. 핵심 기능
 
-- [ ] **시계열 공정 데이터 메인 대시보드**: 선택된 공정(Lot/Wafer)의 센서 데이터(온도, 압력, RF Power 등)를 시간에 따라 선형 차트로 표시. 다중 Y축, 줌인/줌아웃, 패닝, 브러시 확대 기능 제공.
-- [ ] **AI 모델 결과 시각화**: AI 이상 탐지 모델의 예측 결과를 차트 위에 오버레이. 정상 공정 범위(Confidence Band) 표시, 이상 포인트 강조, 툴팁에 이상 점수 노출.
+- [ ] **시계열 공정 데이터 메인 대시보드**: 선택된 공정(Lot/Wafer)의 다변량 센서 데이터를 시간에 따라 선형 차트로 표시. 다중 Y축, 줌인/줌아웃, 패닝, 브러시 확대 기능 제공. X축은 wall clock과 경과 시간(elapsed time) 모드를 전환할 수 있다. 레시피 스텝 경계를 차트에 수직선으로 표시한다.
+- [ ] **Spec Limit 표시**: 센서별 관리 한계선(USL/LSL, UCL/LCL)을 차트에 수평선으로 표시하여, 이상 심각도를 Spec Limit과의 거리로 직관적으로 판단할 수 있도록 한다.
+- [ ] **AI 모델 결과 시각화**: AI 이상 탐지 모델의 예측 결과를 차트 위에 오버레이. 이상 포인트 강조, 이상 유형(Drift/Spike/Shift/Oscillation) 분류 표시, 툴팁에 이상 점수 및 유형 노출.
 - [ ] **다변량 데이터 드릴다운 인터랙션**: 메인 차트에서 특정 시점 클릭 시, 해당 시점의 모든 센서 값을 방사형 차트(Radar Chart)로 표시하고, 원시 데이터를 테이블로 리스팅.
-- [ ] **공정 비교 화면 (Compare Mode)**: Golden Lot 데이터와 현재 분석 중인 Lot 데이터를 겹쳐서 비교. 토글 활성화 시 Golden Lot이 점선으로 추가 렌더링.
+- [ ] **공정 비교 화면 (Compare Mode)**: Golden Lot 데이터와 현재 분석 중인 Lot 데이터를 겹쳐서 비교. 토글 활성화 시 Golden Lot이 점선으로 추가 렌더링. 비교는 동일 레시피/스텝 기준으로 elapsed time 축에서 수행한다.
+- [ ] **Wafer-to-Wafer 비교**: 같은 Lot 내 Wafer 간 센서 트렌드를 겹쳐서 비교하여, 이상이 특정 Wafer에 국한되는지 Lot 전체에 해당하는지 판별할 수 있다.
 
 ## 4. 사용자 스토리
 
-- 엔지니어로서 특정 Lot/Wafer의 센서 데이터를 시간순으로 확인하고 싶다. 그래서 공정 중 발생한 이상 구간을 빠르게 찾을 수 있다.
-- 엔지니어로서 AI가 탐지한 이상 포인트와 이상 점수를 차트 위에서 직접 확인하고 싶다. 그래서 수동 모니터링 없이도 이상 징후를 놓치지 않을 수 있다.
-- 엔지니어로서 이상 시점의 모든 센서 값을 한눈에 비교하고 싶다. 그래서 어떤 센서가 정상 범위를 벗어났는지 즉시 파악할 수 있다.
-- 엔지니어로서 현재 Lot과 Golden Lot의 데이터를 겹쳐서 비교하고 싶다. 그래서 정상 공정과의 차이를 직관적으로 확인할 수 있다.
+- 엔지니어로서 특정 Lot의 특정 Wafer에 대한 센서 데이터를 시간순으로 확인하고 싶다. 그래서 공정 중 발생한 이상 구간을 빠르게 찾을 수 있다.
+- 엔지니어로서 AI가 탐지한 이상 포인트의 점수와 유형(Drift/Spike/Shift 등)을 차트 위에서 직접 확인하고 싶다. 그래서 이상 유형에 따라 적절한 대응 조치를 즉시 결정할 수 있다.
+- 엔지니어로서 이상 시점의 모든 센서 값을 한눈에 비교하고, Spec Limit과의 거리를 확인하고 싶다. 그래서 어떤 센서가 관리 한계를 벗어났는지 즉시 파악할 수 있다.
+- 엔지니어로서 현재 Lot과 Golden Lot의 데이터를 같은 레시피 스텝 기준으로 겹쳐서 비교하고 싶다. 그래서 정상 공정과의 차이를 직관적으로 확인할 수 있다.
+- 엔지니어로서 같은 Lot 내 Wafer 간 데이터를 비교하고 싶다. 그래서 이상이 몇 번째 Wafer부터 시작됐는지 파악할 수 있다.
+- 엔지니어로서 장비/챔버 기준으로 데이터를 필터링하고 싶다. 그래서 특정 챔버에서 반복되는 이상 패턴을 추적할 수 있다.
 
 ## 5. 기술 스택
 
@@ -39,36 +43,130 @@
 
 ## 6. 데이터 모델
 
+### FAB 데이터 계층 구조
+
+실제 반도체 FAB의 데이터 계층을 반영한다.
+
+```
+Equipment (장비)
+  └─ Chamber (챔버, 장비당 2~6개)
+      └─ Recipe (레시피 = 공정 조건 세트)
+          └─ RecipeStep (레시피 내 단계, 3~20개)
+          └─ Lot (로트 = 웨이퍼 묶음, 보통 25장)
+              └─ Wafer (개별 웨이퍼)
+                  └─ WaferRun (1회 공정 실행)
+                      └─ ProcessDataPoint (센서 값, 1초 또는 서브초 간격)
+```
+
+### 핵심 TypeScript 인터페이스
+
 ```typescript
-// 개별 시점의 센서 및 AI 예측 데이터 구조
-export interface ProcessDataPoint {
-  timestamp: string; // ISO 8601 string
-  temperature: number; // 단위: °C
-  pressure: number; // 단위: Torr
-  rfPower: number; // 단위: W
-  isAnomaly: boolean; // AI 이상 감지 여부
-  anomalyScore: number; // 0.0 ~ 1.0
+/** 장비 */
+export interface Equipment {
+  equipmentId: string;
+  name: string;            // 예: "CVD-01", "ETCH-03"
+  type: ProcessType;
+  chambers: Chamber[];
 }
 
-// 전체 공정(Lot) 데이터 묶음
+/** 챔버 */
+export interface Chamber {
+  chamberId: string;
+  name: string;            // 예: "Chamber A", "Chamber B"
+  equipmentId: string;
+}
+
+/** 공정 종류 */
+export type ProcessType = "CVD-PECVD" | "CVD-LPCVD" | "CVD-HDPCVD" | "ETCH-OXIDE" | "ETCH-SI" | "ETCH-DEEP";
+
+/** 레시피 */
+export interface Recipe {
+  recipeId: string;
+  name: string;            // 예: "CVD-STANDARD", "ETCH-DEEP"
+  processType: ProcessType;
+  steps: RecipeStep[];
+}
+
+/** 레시피 스텝 */
+export interface RecipeStep {
+  stepId: string;
+  stepNumber: number;      // 1, 2, 3, ...
+  name: string;            // 예: "Pump Down", "Stabilize", "Deposition", "Purge", "Vent"
+  durationSec: number;     // 목표 소요 시간 (초)
+  targetParams: Record<string, number>;  // 목표 센서 값 (예: { temperature: 400, pressure: 3.5 })
+}
+
+/** 센서 메타데이터 */
+export interface SensorMeta {
+  key: string;             // 예: "temperature", "pressure", "SiH4_flow"
+  label: string;           // 예: "Temperature", "Pressure", "SiH4 Flow"
+  unit: string;            // 예: "°C", "Torr", "mTorr", "sccm", "W"
+  color: string;           // 차트 색상
+  specLimits?: {
+    usl?: number;          // Upper Spec Limit
+    lsl?: number;          // Lower Spec Limit
+    ucl?: number;          // Upper Control Limit
+    lcl?: number;          // Lower Control Limit
+  };
+}
+
+/** Lot (로트 = 웨이퍼 묶음) */
 export interface LotData {
   lotId: string;
-  waferId: string;
+  recipeId: string;
   recipeName: string;
-  startTime: string;
+  equipmentId: string;
+  chamberId: string;
+  isGoldenLot: boolean;
+  waferCount: number;      // 보통 25
+  wafers: WaferRun[];      // 1:N 관계
+}
+
+/** Wafer 단위 공정 실행 데이터 */
+export interface WaferRun {
+  waferId: string;
+  slotNumber: number;      // Lot 내 슬롯 위치 (1~25)
+  startTime: string;       // ISO 8601
   endTime: string;
-  data: ProcessDataPoint[]; // 최소 10,000개 이상
+  data: ProcessDataPoint[];
+}
+
+/** 이상 유형 */
+export type AnomalyType = "drift" | "spike" | "shift" | "oscillation" | "out_of_range" | "pattern";
+
+/** 개별 시점의 센서 및 AI 예측 데이터 */
+export interface ProcessDataPoint {
+  timestamp: string;                   // ISO 8601
+  elapsedSec: number;                  // 공정 시작 후 경과 시간 (초)
+  stepId: string;                      // 현재 레시피 스텝
+  sensors: Record<string, number>;     // 동적 센서 값 (예: { temperature: 400.2, pressure: 3.51, SiH4_flow: 200.5 })
+  isAnomaly: boolean;
+  anomalyScore: number;                // 0.0 ~ 1.0
+  anomalyType?: AnomalyType;          // 이상 유형 (이상 시에만)
 }
 ```
+
+### 센서 구성 (공정별)
+
+센서는 공정 종류에 따라 달라진다. MVP에서는 아래 센서를 지원한다.
+
+| 공정 | 주요 센서 | 단위 참고 |
+|------|----------|----------|
+| CVD (PECVD) | temperature, pressure, rfPower, rfReflected, SiH4_flow, NH3_flow, N2_flow, spacing | 압력: Torr |
+| CVD (LPCVD) | temperature, pressure, SiH4_flow, DCS_flow, N2_flow | 압력: Torr (0.1~2) |
+| Etch (Oxide) | escTemperature, pressure, sourcePower, biasPower, CF4_flow, CHF3_flow, Ar_flow, O2_flow, dcBias | **압력: mTorr** |
+| Etch (Deep Si) | escTemperature, pressure, sourcePower, biasPower, SF6_flow, C4F8_flow, Ar_flow | **압력: mTorr** |
+
+> **주의**: Etch 공정의 압력 단위는 mTorr다. CVD(Torr)와 혼동하지 않는다.
 
 ## 7. UI/UX 레이아웃
 
 화면은 SPA 형태로 3개 영역으로 구성:
 
-1. **Top Navigation Bar**: 프로젝트 로고, Lot/Wafer 선택 Dropdown, Compare Mode Toggle
-2. **Left Sidebar (Filter Panel)**: 기간 선택 (Date Range Picker), 센서 선택 체크박스, AI 이상 탐지 표시 여부 Toggle
+1. **Top Navigation Bar**: 프로젝트 로고, Equipment/Chamber 선택, Lot 선택, Wafer 선택 Dropdown, Compare Mode Toggle
+2. **Left Sidebar (Filter Panel)**: 센서 선택 체크박스 (공정 종류에 따라 동적), AI 이상 탐지 표시 여부 Toggle, Spec Limit 표시 Toggle, X축 모드 전환 (wall clock / elapsed time)
 3. **Main Content Area (Split View)**:
-   - [상단 60%] 메인 시계열 차트 (ECharts, 줌/패닝)
+   - [상단 60%] 메인 시계열 차트 (ECharts, 줌/패닝, 스텝 경계선 표시, Spec Limit 수평선)
    - [하단 40%] 드릴다운 패널 (좌: Radar Chart / 우: Parameter Data Table)
 
 ## 8. 비기능 요구사항
@@ -88,4 +186,5 @@ export interface LotData {
 
 - **v0.1 MVP**: 메인 시계열 대시보드 + AI 이상탐지 시각화 + Mock 데이터 기반 동작
 - **v0.2**: 드릴다운 인터랙션 + 공정 비교 모드
+- **v0.3**: 데이터 모델 고도화 (Lot-Wafer 1:N, Equipment/Chamber, Recipe Step, 동적 센서, Spec Limit, 이상 유형 분류)
 - **v1.0 정식 출시**: Supabase 연동, 실 데이터 기반 동작, 성능 최적화 완료

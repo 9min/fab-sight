@@ -230,69 +230,178 @@ type UpdateTodoInput = Database["public"]["Tables"]["todos"]["Update"];
 
 ## FabSight 데이터 모델
 
+### FAB 데이터 계층 구조
+
+실제 반도체 FAB의 데이터 계층을 반영한다. 상세 인터페이스 정의는 [PRD](prd.md)를 참조한다.
+
+```
+Equipment (장비)
+  └─ Chamber (챔버, 장비당 2~6개)
+      └─ Recipe (레시피 = 공정 조건 세트)
+          └─ RecipeStep (레시피 내 단계, 3~20개)
+          └─ Lot (로트 = 웨이퍼 묶음, 보통 25장)
+              └─ Wafer (개별 웨이퍼)
+                  └─ WaferRun (1회 공정 실행)
+                      └─ ProcessDataPoint (센서 값, 1초 간격)
+```
+
 ### MVP 단계: Mock 데이터 사용
 
-MVP 단계에서는 Supabase 테이블 대신 `src/mocks/` 디렉토리의 Mock 데이터를 사용한다. 추후 Supabase로 전환 시 아래 테이블 설계를 적용한다.
+MVP 단계에서는 Supabase 테이블 대신 `src/mocks/` 디렉토리의 Mock 데이터를 사용한다. Mock 데이터도 올바른 FAB 데이터 구조(Lot-Wafer 1:N, Recipe Step, 동적 센서)를 따라야 추후 Supabase 전환이 매끄럽다.
 
 ### 핵심 TypeScript 인터페이스
 
 ```typescript
-// src/types/process.ts
+// src/types/process.ts — 상세 정의는 PRD 참조
 
-// 개별 시점의 센서 및 AI 예측 데이터
-export interface ProcessDataPoint {
-  timestamp: string;    // ISO 8601
-  temperature: number;  // °C
-  pressure: number;     // Torr
-  rfPower: number;      // W
-  isAnomaly: boolean;
-  anomalyScore: number; // 0.0 ~ 1.0
+/** 공정 종류 */
+type ProcessType = "CVD-PECVD" | "CVD-LPCVD" | "CVD-HDPCVD" | "ETCH-OXIDE" | "ETCH-SI" | "ETCH-DEEP";
+
+/** 이상 유형 */
+type AnomalyType = "drift" | "spike" | "shift" | "oscillation" | "out_of_range" | "pattern";
+
+/** Lot (1:N Wafers) */
+interface LotData {
+  lotId: string;
+  recipeId: string;
+  recipeName: string;
+  equipmentId: string;
+  chamberId: string;
+  isGoldenLot: boolean;
+  waferCount: number;       // 보통 25
+  wafers: WaferRun[];       // Lot → Wafer 1:N
 }
 
-// 전체 공정(Lot) 데이터
-export interface LotData {
-  lotId: string;
+/** Wafer 단위 공정 실행 */
+interface WaferRun {
   waferId: string;
-  recipeName: string;
+  slotNumber: number;       // 1~25
   startTime: string;
   endTime: string;
-  data: ProcessDataPoint[]; // 최소 10,000개
+  data: ProcessDataPoint[];
+}
+
+/** 개별 시점 센서 데이터 */
+interface ProcessDataPoint {
+  timestamp: string;
+  elapsedSec: number;                // 공정 시작 후 경과 시간
+  stepId: string;                    // 현재 레시피 스텝
+  sensors: Record<string, number>;   // 동적 센서 값
+  isAnomaly: boolean;
+  anomalyScore: number;
+  anomalyType?: AnomalyType;
+}
+
+/** 센서 메타데이터 (Spec Limit 포함) */
+interface SensorMeta {
+  key: string;
+  label: string;
+  unit: string;       // 공정별로 다름 (Torr vs mTorr 등)
+  color: string;
+  specLimits?: { usl?: number; lsl?: number; ucl?: number; lcl?: number; };
 }
 ```
+
+### 핵심 설계 원칙
+
+| 원칙 | 설명 |
+|------|------|
+| **Lot-Wafer 1:N** | 1 Lot = 25 Wafers. `LotData.wafers`로 접근 |
+| **Equipment/Chamber 추적** | 이상 발생 시 "어떤 장비의 어떤 챔버인가?" 추적 가능 |
+| **Recipe Step 포함** | 센서 패턴은 스텝에 의해 결정됨. 스텝 없이는 정상/이상 판단 불가 |
+| **동적 센서** | 공정 종류별 센서 수/종류가 다름. `Record<string, number>` 사용 |
+| **공정별 단위 구분** | CVD: 압력 Torr, Etch: 압력 **mTorr**. SensorMeta.unit으로 관리 |
+| **이상 유형 분류** | Drift/Spike/Shift/Oscillation 등 유형별 대응이 다름 |
 
 ### 추후 Supabase 테이블 설계 (v1.0)
 
 ```sql
--- 공정(Lot) 테이블
-CREATE TABLE lots (
+-- 장비
+CREATE TABLE equipment (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  lot_id TEXT UNIQUE NOT NULL,
-  wafer_id TEXT NOT NULL,
-  recipe_name TEXT NOT NULL,
-  start_time TIMESTAMPTZ NOT NULL,
-  end_time TIMESTAMPTZ NOT NULL,
-  is_golden_lot BOOLEAN DEFAULT FALSE,
+  equipment_id TEXT UNIQUE NOT NULL,   -- "CVD-01", "ETCH-03"
+  name TEXT NOT NULL,
+  process_type TEXT NOT NULL,          -- "CVD-PECVD", "ETCH-OXIDE" 등
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
--- 공정 데이터 포인트 테이블 (시계열)
-CREATE TABLE process_data_points (
+-- 챔버 (Equipment 1:N Chamber)
+CREATE TABLE chambers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  lot_id UUID REFERENCES lots(id) ON DELETE CASCADE NOT NULL,
-  timestamp TIMESTAMPTZ NOT NULL,
-  temperature DOUBLE PRECISION NOT NULL,
-  pressure DOUBLE PRECISION NOT NULL,
-  rf_power DOUBLE PRECISION NOT NULL,
-  is_anomaly BOOLEAN DEFAULT FALSE,
-  anomaly_score DOUBLE PRECISION DEFAULT 0.0,
+  chamber_id TEXT UNIQUE NOT NULL,
+  equipment_id UUID REFERENCES equipment(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,                  -- "Chamber A", "Chamber B"
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- 레시피
+CREATE TABLE recipes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  recipe_id TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,                  -- "CVD-STANDARD", "ETCH-DEEP"
+  process_type TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- 레시피 스텝 (Recipe 1:N Step)
+CREATE TABLE recipe_steps (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  recipe_id UUID REFERENCES recipes(id) ON DELETE CASCADE NOT NULL,
+  step_number INTEGER NOT NULL,
+  name TEXT NOT NULL,                  -- "Pump Down", "Deposition" 등
+  duration_sec INTEGER NOT NULL,
+  target_params JSONB NOT NULL,        -- {"temperature": 400, "pressure": 3.5, ...}
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
--- 성능을 위한 인덱스
-CREATE INDEX idx_process_data_points_lot_id ON process_data_points(lot_id);
-CREATE INDEX idx_process_data_points_timestamp ON process_data_points(timestamp);
-CREATE INDEX idx_process_data_points_is_anomaly ON process_data_points(is_anomaly) WHERE is_anomaly = TRUE;
+-- Lot (로트)
+CREATE TABLE lots (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  lot_id TEXT UNIQUE NOT NULL,
+  recipe_id UUID REFERENCES recipes(id) NOT NULL,
+  chamber_id UUID REFERENCES chambers(id) NOT NULL,
+  is_golden_lot BOOLEAN DEFAULT FALSE,
+  wafer_count INTEGER NOT NULL DEFAULT 25,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- Wafer (Lot 1:N Wafer)
+CREATE TABLE wafers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  lot_id UUID REFERENCES lots(id) ON DELETE CASCADE NOT NULL,
+  wafer_id TEXT NOT NULL,
+  slot_number INTEGER NOT NULL,        -- 1~25
+  start_time TIMESTAMPTZ NOT NULL,
+  end_time TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- 공정 데이터 포인트 (시계열, 동적 센서)
+CREATE TABLE process_data_points (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  wafer_id UUID REFERENCES wafers(id) ON DELETE CASCADE NOT NULL,
+  step_id UUID REFERENCES recipe_steps(id) NOT NULL,
+  timestamp TIMESTAMPTZ NOT NULL,
+  elapsed_sec DOUBLE PRECISION NOT NULL,
+  sensors JSONB NOT NULL,              -- {"temperature": 400.2, "pressure": 3.51, "SiH4_flow": 200.5}
+  is_anomaly BOOLEAN DEFAULT FALSE,
+  anomaly_score DOUBLE PRECISION DEFAULT 0.0,
+  anomaly_type TEXT,                   -- "drift", "spike", "shift" 등
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- 성능 인덱스
+CREATE INDEX idx_wafers_lot_id ON wafers(lot_id);
+CREATE INDEX idx_process_data_wafer_id ON process_data_points(wafer_id);
+CREATE INDEX idx_process_data_timestamp ON process_data_points(timestamp);
+CREATE INDEX idx_process_data_step_id ON process_data_points(step_id);
+CREATE INDEX idx_process_data_anomaly ON process_data_points(is_anomaly) WHERE is_anomaly = TRUE;
+CREATE INDEX idx_lots_chamber_id ON lots(chamber_id);
+CREATE INDEX idx_lots_recipe_id ON lots(recipe_id);
 ```
 
 ## 관련 문서
