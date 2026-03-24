@@ -1,0 +1,177 @@
+import type { Recipe } from "@/types/fab";
+
+/** CVD-STANDARD (SiN PECVD 증착) 레시피 */
+export const RECIPE_CVD_STANDARD: Recipe = {
+	recipeId: "recipe-cvd-standard",
+	name: "CVD-STANDARD",
+	processType: "CVD-PECVD",
+	steps: [
+		{
+			stepId: "cvd-std-s1",
+			stepNumber: 1,
+			name: "Pump Down",
+			durationSec: 45,
+			targetParams: {
+				temperature: 300,
+				pressure: 0.05,
+				rfPower: 0,
+				rfReflected: 0,
+				SiH4_flow: 0,
+				NH3_flow: 0,
+				N2_flow: 500,
+				spacing: 400,
+			},
+		},
+		{
+			stepId: "cvd-std-s2",
+			stepNumber: 2,
+			name: "Heat & Stabilize",
+			durationSec: 90,
+			targetParams: {
+				temperature: 400,
+				pressure: 3.5,
+				rfPower: 0,
+				rfReflected: 0,
+				SiH4_flow: 10,
+				NH3_flow: 0,
+				N2_flow: 500,
+				spacing: 400,
+			},
+		},
+		{
+			stepId: "cvd-std-s3",
+			stepNumber: 3,
+			name: "Deposition",
+			durationSec: 300,
+			targetParams: {
+				temperature: 400,
+				pressure: 3.5,
+				rfPower: 400,
+				rfReflected: 8,
+				SiH4_flow: 200,
+				NH3_flow: 1000,
+				N2_flow: 500,
+				spacing: 400,
+			},
+		},
+		{
+			stepId: "cvd-std-s4",
+			stepNumber: 4,
+			name: "Purge",
+			durationSec: 20,
+			targetParams: {
+				temperature: 400,
+				pressure: 0.1,
+				rfPower: 0,
+				rfReflected: 0,
+				SiH4_flow: 0,
+				NH3_flow: 0,
+				N2_flow: 1000,
+				spacing: 400,
+			},
+		},
+		{
+			stepId: "cvd-std-s5",
+			stepNumber: 5,
+			name: "Vent",
+			durationSec: 45,
+			targetParams: {
+				temperature: 350,
+				pressure: 760,
+				rfPower: 0,
+				rfReflected: 0,
+				SiH4_flow: 0,
+				NH3_flow: 0,
+				N2_flow: 200,
+				spacing: 600,
+			},
+		},
+	],
+};
+
+/** ETCH-DEEP (Deep Si Etch / Bosch Process) 레시피 — 간소화 버전 */
+export const RECIPE_ETCH_DEEP: Recipe = {
+	recipeId: "recipe-etch-deep",
+	name: "ETCH-DEEP",
+	processType: "ETCH-DEEP",
+	steps: [
+		{
+			stepId: "etch-deep-s1",
+			stepNumber: 1,
+			name: "Pump & Stabilize",
+			durationSec: 45,
+			targetParams: {
+				escTemperature: 20,
+				pressure: 10,
+				sourcePower: 0,
+				biasPower: 0,
+				SF6_flow: 0,
+				C4F8_flow: 0,
+				Ar_flow: 100,
+			},
+		},
+		{
+			stepId: "etch-deep-s2",
+			stepNumber: 2,
+			name: "Breakthrough",
+			durationSec: 20,
+			targetParams: {
+				escTemperature: 20,
+				pressure: 15,
+				sourcePower: 1500,
+				biasPower: 300,
+				SF6_flow: 0,
+				C4F8_flow: 0,
+				Ar_flow: 100,
+			},
+		},
+		{
+			stepId: "etch-deep-s3",
+			stepNumber: 3,
+			name: "Etch Cycle",
+			durationSec: 200,
+			targetParams: {
+				escTemperature: 20,
+				pressure: 30,
+				sourcePower: 2000,
+				biasPower: 150,
+				SF6_flow: 300,
+				C4F8_flow: 0,
+				Ar_flow: 50,
+			},
+		},
+		{
+			stepId: "etch-deep-s4",
+			stepNumber: 4,
+			name: "Over-etch",
+			durationSec: 45,
+			targetParams: {
+				escTemperature: 20,
+				pressure: 30,
+				sourcePower: 2000,
+				biasPower: 100,
+				SF6_flow: 200,
+				C4F8_flow: 0,
+				Ar_flow: 50,
+			},
+		},
+		{
+			stepId: "etch-deep-s5",
+			stepNumber: 5,
+			name: "Vent",
+			durationSec: 30,
+			targetParams: {
+				escTemperature: 20,
+				pressure: 760000,
+				sourcePower: 0,
+				biasPower: 0,
+				SF6_flow: 0,
+				C4F8_flow: 0,
+				Ar_flow: 0,
+			},
+		},
+	],
+};
+
+/** 사용 가능한 모든 레시피 */
+export const MOCK_RECIPES: Recipe[] = [RECIPE_CVD_STANDARD, RECIPE_ETCH_DEEP];
