@@ -1,4 +1,4 @@
-# CLAUDE.md - Amfibian Lite 프로젝트 규칙
+# CLAUDE.md - FabSight 프로젝트 규칙
 
 ## 프로젝트 개요
 

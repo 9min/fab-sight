@@ -1,4 +1,4 @@
-# 📝 [PRD] Amfibian Lite: AI 기반 반도체 공정 데이터 분석 대시보드 (MVP)
+# 📝 [PRD] FabSight: AI 기반 반도체 공정 데이터 분석 대시보드 (MVP)
 
 ## 1. 프로젝트 개요 (Overview)
 * **목적:** 반도체 장비(Etcher/CVD)에서 발생하는 대용량 시계열 센서 데이터와 AI 이상 탐지(Anomaly Detection) 모델의 결과를 시각화하여, 엔지니어가 공정 이상 원인을 빠르게 분석하고 대응할 수 있도록 지원하는 웹 대시보드.
@@ -38,7 +38,7 @@
 화면은 크게 3개의 영역으로 분할하여 Single Page Application(SPA) 형태로 구성합니다.
 
 1.  **Top Navigation Bar:**
-    * 프로젝트 로고 (Amfibian Lite)
+    * 프로젝트 로고 (FabSight)
     * 공정(Lot/Wafer) 선택 Dropdown
     * Compare Mode Toggle
 2.  **Left Sidebar (Filter Panel):**

@@ -344,7 +344,7 @@ interface Toast {
 </div>
 ```
 
-## Amfibian Lite 대시보드 디자인
+## FabSight 대시보드 디자인
 
 ### 대시보드 색상 체계
 
