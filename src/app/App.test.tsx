@@ -7,4 +7,11 @@ describe("App", () => {
 		render(<App />);
 		expect(screen.getByText("FabSight")).toBeInTheDocument();
 	});
+
+	it("대시보드 레이아웃이 렌더링된다", () => {
+		render(<App />);
+		expect(screen.getByRole("navigation")).toBeInTheDocument();
+		expect(screen.getByRole("complementary")).toBeInTheDocument();
+		expect(screen.getByRole("main")).toBeInTheDocument();
+	});
 });
