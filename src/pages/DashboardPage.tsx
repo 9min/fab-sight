@@ -10,6 +10,8 @@ import { useDashboardStore } from "@/stores/useDashboardStore";
 import { useCallback, useEffect, useMemo } from "react";
 
 export function DashboardPage() {
+	const selectedEquipmentId = useDashboardStore((s) => s.selectedEquipmentId);
+	const selectedChamberId = useDashboardStore((s) => s.selectedChamberId);
 	const selectedLotId = useDashboardStore((s) => s.selectedLotId);
 	const selectedWaferId = useDashboardStore((s) => s.selectedWaferId);
 	const selectedSensors = useDashboardStore((s) => s.selectedSensors);
@@ -23,14 +25,23 @@ export function DashboardPage() {
 	const setSelectedSensors = useDashboardStore((s) => s.setSelectedSensors);
 	const setSelectedTimestamp = useDashboardStore((s) => s.setSelectedTimestamp);
 
-	useEffect(() => {
-		if (!selectedLotId && MOCK_LOT_SUMMARIES_V3.length > 1) {
-			const first = MOCK_LOT_SUMMARIES_V3.find((s) => !s.isGoldenLot);
-			if (first) {
-				setSelectedLot(first.lotId);
-			}
+	// 장비/챔버 필터를 반영한 Lot 목록
+	const filteredLots = useMemo(() => {
+		let lots = MOCK_LOT_SUMMARIES_V3.filter((s) => !s.isGoldenLot);
+		if (selectedChamberId) {
+			lots = lots.filter((s) => s.chamberId === selectedChamberId);
+		} else if (selectedEquipmentId) {
+			lots = lots.filter((s) => s.equipmentId === selectedEquipmentId);
 		}
-	}, [selectedLotId, setSelectedLot]);
+		return lots;
+	}, [selectedEquipmentId, selectedChamberId]);
+
+	// Lot 미선택 시 필터된 목록의 첫 번째 Lot 자동 선택
+	useEffect(() => {
+		if (!selectedLotId && filteredLots.length > 0) {
+			setSelectedLot(filteredLots[0].lotId);
+		}
+	}, [selectedLotId, filteredLots, setSelectedLot]);
 
 	const { data: lotData, isLoading } = useProcessData(selectedLotId);
 	const { data: goldenLotData } = useGoldenLotData(isCompareMode);
