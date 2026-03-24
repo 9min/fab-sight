@@ -1,5 +1,7 @@
+import { DrilldownPanel } from "@/components/drilldown/DrilldownPanel";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AnomalyToggle } from "@/components/ui/AnomalyToggle";
+import { CompareToggle } from "@/components/ui/CompareToggle";
 import { LotSelector } from "@/components/ui/LotSelector";
 import { SensorCheckboxGroup } from "@/components/ui/SensorCheckbox";
 import { queryClient } from "@/lib/queryClient";
@@ -10,7 +12,12 @@ export function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<DashboardLayout
-				navControls={<LotSelector />}
+				navControls={
+					<>
+						<LotSelector />
+						<CompareToggle />
+					</>
+				}
 				sidebarContent={
 					<>
 						<div>
@@ -28,13 +35,7 @@ export function App() {
 					</>
 				}
 				chartArea={<DashboardPage />}
-				drilldownArea={
-					<div className="flex h-full items-center justify-center">
-						<p className="text-sm text-slate-500">
-							차트에서 타임스탬프를 클릭하면 상세 정보를 확인할 수 있습니다
-						</p>
-					</div>
-				}
+				drilldownArea={<DrilldownPanel />}
 			/>
 		</QueryClientProvider>
 	);

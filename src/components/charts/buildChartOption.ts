@@ -9,11 +9,13 @@ export function buildChartOption(
 	data: ProcessDataPoint[],
 	selectedSensors: SensorType[],
 ): EChartsOption {
+	// 축 배치: 좌(temp) / 우(pressure) / 우(rfPower, offset)
 	const yAxis = selectedSensors.map((sensor, index) => ({
 		type: "value" as const,
-		name: `${SENSOR_META[sensor].label} (${SENSOR_META[sensor].unit})`,
-		position: index % 2 === 0 ? ("left" as const) : ("right" as const),
-		offset: Math.floor(index / 2) * 60,
+		scale: true,
+		name: SENSOR_META[sensor].unit,
+		position: index === 0 ? ("left" as const) : ("right" as const),
+		offset: index <= 1 ? 0 : 50,
 		axisLine: {
 			show: true,
 			lineStyle: { color: SENSOR_META[sensor].color },
@@ -43,6 +45,7 @@ export function buildChartOption(
 			type: "line" as const,
 			yAxisIndex: index,
 			showSymbol: false,
+			clip: true,
 			lineStyle: {
 				color: SENSOR_META[sensor].color,
 				width: 1.5,
@@ -68,8 +71,8 @@ export function buildChartOption(
 			top: 8,
 		},
 		grid: {
-			left: 60,
-			right: 60,
+			left: 50,
+			right: selectedSensors.length > 2 ? 110 : 60,
 			top: 50,
 			bottom: 80,
 			containLabel: false,
