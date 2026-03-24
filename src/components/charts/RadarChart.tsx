@@ -1,3 +1,4 @@
+import type { SensorMeta } from "@/types/process";
 import type { RadarDataItem } from "@/utils/drilldownUtils";
 import ReactECharts from "echarts-for-react";
 import { memo, useMemo } from "react";
@@ -5,10 +6,11 @@ import { buildRadarOption } from "./buildRadarOption";
 
 interface RadarChartProps {
 	data: RadarDataItem[];
+	sensorsMeta: SensorMeta[];
 }
 
-export const RadarChart = memo(function RadarChart({ data }: RadarChartProps) {
-	const option = useMemo(() => buildRadarOption(data), [data]);
+export const RadarChart = memo(function RadarChart({ data, sensorsMeta }: RadarChartProps) {
+	const option = useMemo(() => buildRadarOption(data, sensorsMeta), [data, sensorsMeta]);
 
 	return (
 		<ReactECharts

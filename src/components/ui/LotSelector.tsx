@@ -1,4 +1,4 @@
-import { MOCK_LOT_SUMMARIES } from "@/mocks/mockLots";
+import { MOCK_LOT_SUMMARIES_V3 } from "@/mocks/mockLotsV3";
 import { useDashboardStore } from "@/stores/useDashboardStore";
 import type { ChangeEvent } from "react";
 import { useCallback } from "react";
@@ -10,9 +10,8 @@ export function LotSelector() {
 	const handleChange = useCallback(
 		(e: ChangeEvent<HTMLSelectElement>) => {
 			const lotId = e.target.value;
-			const summary = MOCK_LOT_SUMMARIES.find((s) => s.lotId === lotId);
-			if (summary) {
-				setSelectedLot(summary.lotId, summary.waferId);
+			if (lotId) {
+				setSelectedLot(lotId);
 			}
 		},
 		[setSelectedLot],
@@ -28,9 +27,9 @@ export function LotSelector() {
 			<option value="" disabled>
 				Lot 선택...
 			</option>
-			{MOCK_LOT_SUMMARIES.map((summary) => (
+			{MOCK_LOT_SUMMARIES_V3.filter((s) => !s.isGoldenLot).map((summary) => (
 				<option key={summary.lotId} value={summary.lotId}>
-					{summary.lotId} / {summary.waferId}
+					{summary.lotId} ({summary.recipeName})
 				</option>
 			))}
 		</select>

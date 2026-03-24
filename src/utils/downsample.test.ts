@@ -1,4 +1,4 @@
-import type { ProcessDataPoint } from "@/types/process";
+import { createMockDataPoints } from "@/test/helpers";
 import { describe, expect, it } from "vitest";
 import { extractSensorSeries, lttbDownsample } from "./downsample";
 
@@ -63,7 +63,6 @@ describe("lttbDownsample", () => {
 	});
 
 	it("피크 값을 보존하는 경향이 있다", () => {
-		// 대부분 평탄하지만 중간에 큰 피크가 있는 데이터
 		const data = Array.from({ length: 200 }, (_, i) => ({
 			x: i,
 			y: i === 100 ? 1000 : 10,
@@ -75,47 +74,32 @@ describe("lttbDownsample", () => {
 });
 
 describe("extractSensorSeries", () => {
-	const mockPoints: ProcessDataPoint[] = [
-		{
-			timestamp: "2024-01-01T00:00:00.000Z",
-			temperature: 500,
-			pressure: 5,
-			rfPower: 1500,
-			isAnomaly: false,
-			anomalyScore: 0.1,
-		},
-		{
-			timestamp: "2024-01-01T00:00:01.000Z",
-			temperature: 510,
-			pressure: 5.2,
-			rfPower: 1520,
-			isAnomaly: false,
-			anomalyScore: 0.15,
-		},
-	];
+	const mockPoints = createMockDataPoints(2);
 
 	it("temperature 센서 시리즈를 추출한다", () => {
 		const result = extractSensorSeries(mockPoints, "temperature");
 		expect(result).toHaveLength(2);
-		expect(result[0].y).toBe(500);
-		expect(result[1].y).toBe(510);
+		expect(result[0].y).toBe(mockPoints[0].sensors.temperature);
 	});
 
 	it("pressure 센서 시리즈를 추출한다", () => {
 		const result = extractSensorSeries(mockPoints, "pressure");
-		expect(result[0].y).toBe(5);
-		expect(result[1].y).toBe(5.2);
+		expect(result[0].y).toBe(mockPoints[0].sensors.pressure);
 	});
 
 	it("rfPower 센서 시리즈를 추출한다", () => {
 		const result = extractSensorSeries(mockPoints, "rfPower");
-		expect(result[0].y).toBe(1500);
-		expect(result[1].y).toBe(1520);
+		expect(result[0].y).toBe(mockPoints[0].sensors.rfPower);
 	});
 
-	it("x 값이 타임스탬프의 밀리초 값이다", () => {
-		const result = extractSensorSeries(mockPoints, "temperature");
-		expect(result[0].x).toBe(new Date("2024-01-01T00:00:00.000Z").getTime());
-		expect(result[1].x).toBe(new Date("2024-01-01T00:00:01.000Z").getTime());
+	it("wallClock 모드에서 x 값이 타임스탬프의 밀리초 값이다", () => {
+		const result = extractSensorSeries(mockPoints, "temperature", "wallClock");
+		expect(result[0].x).toBe(new Date(mockPoints[0].timestamp).getTime());
+	});
+
+	it("elapsed 모드에서 x 값이 elapsedSec이다", () => {
+		const result = extractSensorSeries(mockPoints, "temperature", "elapsed");
+		expect(result[0].x).toBe(mockPoints[0].elapsedSec);
+		expect(result[1].x).toBe(mockPoints[1].elapsedSec);
 	});
 });
