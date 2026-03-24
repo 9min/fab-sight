@@ -2,7 +2,6 @@ import {
 	ANOMALY_HIGH_COLOR,
 	ANOMALY_MEDIUM_COLOR,
 	ANOMALY_THRESHOLD_HIGH,
-	CONFIDENCE_BAND_COLOR,
 } from "@/constants/chart";
 import type { ProcessDataPoint } from "@/types/process";
 import type { SeriesOption } from "echarts";
@@ -24,17 +23,6 @@ export function buildAnomalyOverlay(data: ProcessDataPoint[], show: boolean): Se
 		};
 	});
 
-	const confidenceBand: SeriesOption = {
-		name: "정상 범위",
-		type: "line",
-		data: data.map((p) => [new Date(p.timestamp).getTime(), p.temperature]),
-		lineStyle: { opacity: 0 },
-		areaStyle: { color: CONFIDENCE_BAND_COLOR },
-		symbol: "none",
-		silent: true,
-		z: -1,
-	};
-
 	const anomalyScatter: SeriesOption = {
 		name: "이상 탐지",
 		type: "scatter",
@@ -43,5 +31,5 @@ export function buildAnomalyOverlay(data: ProcessDataPoint[], show: boolean): Se
 		z: 10,
 	};
 
-	return [confidenceBand, anomalyScatter];
+	return [anomalyScatter];
 }

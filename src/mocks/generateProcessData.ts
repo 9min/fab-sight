@@ -78,17 +78,17 @@ function generateDataPoints(pointCount: number, anomalyRatio: number): ProcessDa
 		rf += (BASE_RF - rf) * 0.02;
 
 		if (isAnomaly) {
-			// 이상치: 값을 급격하게 벗어나게 함
-			const spike = (Math.random() - 0.3) * 2;
-			temp += spike * 80;
-			pressure += spike * 2;
-			rf += spike * 400;
+			// 이상치: 정상 범위를 약간 벗어나는 수준
+			const spike = (Math.random() - 0.3) * 1.2;
+			temp += spike * 40;
+			pressure += spike * 1;
+			rf += spike * 200;
 		}
 
 		// 값 범위 제한
-		temp = clamp(temp, 250, 850);
-		pressure = clamp(pressure, 0.2, 12);
-		rf = clamp(rf, 80, 3200);
+		temp = clamp(temp, 300, 750);
+		pressure = clamp(pressure, 0.5, 10);
+		rf = clamp(rf, 200, 2800);
 
 		const anomalyScore = isAnomaly ? 0.5 + Math.random() * 0.5 : Math.random() * 0.3;
 
