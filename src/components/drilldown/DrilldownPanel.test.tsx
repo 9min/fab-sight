@@ -1,4 +1,5 @@
 import { useDashboardStore } from "@/stores/useDashboardStore";
+import { MOCK_SENSORS_META } from "@/test/helpers";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -10,7 +11,7 @@ function renderWithProviders() {
 	});
 	return render(
 		<QueryClientProvider client={queryClient}>
-			<DrilldownPanel />
+			<DrilldownPanel sensorsMeta={MOCK_SENSORS_META} />
 		</QueryClientProvider>,
 	);
 }

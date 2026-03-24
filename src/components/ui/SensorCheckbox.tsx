@@ -1,20 +1,21 @@
 import { useDashboardStore } from "@/stores/useDashboardStore";
-import type { SensorType } from "@/types/process";
-import { SENSOR_META } from "@/types/process";
+import type { SensorMeta } from "@/types/process";
 import { useCallback } from "react";
 
-const SENSORS: SensorType[] = ["temperature", "pressure", "rfPower"];
+interface SensorCheckboxGroupProps {
+	sensorsMeta: SensorMeta[];
+}
 
-export function SensorCheckboxGroup() {
+export function SensorCheckboxGroup({ sensorsMeta }: SensorCheckboxGroupProps) {
 	const selectedSensors = useDashboardStore((s) => s.selectedSensors);
 	const setSelectedSensors = useDashboardStore((s) => s.setSelectedSensors);
 
 	const handleToggle = useCallback(
-		(sensor: SensorType) => {
-			if (selectedSensors.includes(sensor)) {
-				setSelectedSensors(selectedSensors.filter((s) => s !== sensor));
+		(sensorKey: string) => {
+			if (selectedSensors.includes(sensorKey)) {
+				setSelectedSensors(selectedSensors.filter((s) => s !== sensorKey));
 			} else {
-				setSelectedSensors([...selectedSensors, sensor]);
+				setSelectedSensors([...selectedSensors, sensorKey]);
 			}
 		},
 		[selectedSensors, setSelectedSensors],
@@ -22,18 +23,17 @@ export function SensorCheckboxGroup() {
 
 	return (
 		<div className="flex flex-col gap-2">
-			{SENSORS.map((sensor) => {
-				const meta = SENSOR_META[sensor];
-				const checked = selectedSensors.includes(sensor);
+			{sensorsMeta.map((meta) => {
+				const checked = selectedSensors.includes(meta.key);
 				return (
 					<label
-						key={sensor}
+						key={meta.key}
 						className="flex cursor-pointer items-center gap-2 text-sm text-slate-300"
 					>
 						<input
 							type="checkbox"
 							checked={checked}
-							onChange={() => handleToggle(sensor)}
+							onChange={() => handleToggle(meta.key)}
 							className="sr-only"
 							aria-label={meta.label}
 						/>

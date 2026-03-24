@@ -1,61 +1,88 @@
 import { DOWNSAMPLE_TARGET, DOWNSAMPLE_THRESHOLD } from "@/constants/chart";
-import type { ProcessDataPoint, SensorType } from "@/types/process";
-import { SENSOR_META } from "@/types/process";
-import { extractSensorSeries, lttbDownsample } from "@/utils/downsample";
+import type { ProcessDataPoint, SensorMeta } from "@/types/process";
+import { type XAxisMode, extractSensorSeries, lttbDownsample } from "@/utils/downsample";
 import type { EChartsOption } from "echarts";
 
 /** 시계열 차트 ECharts 옵션을 생성한다 */
 export function buildChartOption(
 	data: ProcessDataPoint[],
-	selectedSensors: SensorType[],
+	selectedSensors: string[],
+	sensorsMeta: SensorMeta[],
+	xAxisMode: XAxisMode = "wallClock",
 ): EChartsOption {
-	// 축 배치: 좌(temp) / 우(pressure) / 우(rfPower, offset)
-	const yAxis = selectedSensors.map((sensor, index) => ({
-		type: "value" as const,
-		scale: true,
-		name: SENSOR_META[sensor].unit,
-		position: index === 0 ? ("left" as const) : ("right" as const),
-		offset: index <= 1 ? 0 : 50,
-		axisLine: {
-			show: true,
-			lineStyle: { color: SENSOR_META[sensor].color },
-		},
-		axisLabel: {
-			color: SENSOR_META[sensor].color,
-		},
-		splitLine: {
-			show: index === 0,
-			lineStyle: { color: "#334155" },
-		},
-		nameTextStyle: {
-			color: SENSOR_META[sensor].color,
-			fontSize: 11,
-		},
-	}));
+	const sensorMetaMap = new Map(sensorsMeta.map((m) => [m.key, m]));
 
-	const series = selectedSensors.map((sensor, index) => {
-		let seriesData = extractSensorSeries(data, sensor);
+	/** 단위별 Y축 그룹화: 같은 단위 센서는 같은 축 공유 */
+	const unitToAxisIndex = new Map<string, number>();
+	const yAxis: EChartsOption["yAxis"] = [];
 
-		if (seriesData.length > DOWNSAMPLE_THRESHOLD) {
-			seriesData = lttbDownsample(seriesData, DOWNSAMPLE_TARGET);
+	for (const sensorKey of selectedSensors) {
+		const meta = sensorMetaMap.get(sensorKey);
+		if (!meta) continue;
+		if (!unitToAxisIndex.has(meta.unit)) {
+			const axisIndex = unitToAxisIndex.size;
+			unitToAxisIndex.set(meta.unit, axisIndex);
+			yAxis.push({
+				type: "value" as const,
+				scale: true,
+				name: meta.unit,
+				position: axisIndex === 0 ? ("left" as const) : ("right" as const),
+				offset: axisIndex <= 1 ? 0 : (axisIndex - 1) * 50,
+				axisLine: { show: true, lineStyle: { color: meta.color } },
+				axisLabel: { color: meta.color },
+				splitLine: { show: axisIndex === 0, lineStyle: { color: "#334155" } },
+				nameTextStyle: { color: meta.color, fontSize: 11 },
+			});
 		}
+	}
 
-		return {
-			name: SENSOR_META[sensor].label,
-			type: "line" as const,
-			yAxisIndex: index,
-			showSymbol: false,
-			clip: true,
-			lineStyle: {
-				color: SENSOR_META[sensor].color,
-				width: 1.5,
-			},
-			itemStyle: {
-				color: SENSOR_META[sensor].color,
-			},
-			data: seriesData.map((p) => [p.x, p.y]),
-		};
-	});
+	const series = selectedSensors
+		.map((sensorKey) => {
+			const meta = sensorMetaMap.get(sensorKey);
+			if (!meta) return null;
+
+			let seriesData = extractSensorSeries(data, sensorKey, xAxisMode);
+			if (seriesData.length > DOWNSAMPLE_THRESHOLD) {
+				seriesData = lttbDownsample(seriesData, DOWNSAMPLE_TARGET);
+			}
+
+			const axisIndex = unitToAxisIndex.get(meta.unit) ?? 0;
+
+			return {
+				name: meta.label,
+				type: "line" as const,
+				yAxisIndex: axisIndex,
+				showSymbol: false,
+				clip: true,
+				lineStyle: { color: meta.color, width: 1.5 },
+				itemStyle: { color: meta.color },
+				data: seriesData.map((p) => [p.x, p.y]),
+			};
+		})
+		.filter((s): s is NonNullable<typeof s> => s !== null);
+
+	const xAxisConfig =
+		xAxisMode === "elapsed"
+			? {
+					type: "value" as const,
+					name: "경과 시간 (초)",
+					axisLabel: {
+						color: "#94A3B8",
+						formatter: (v: number) => {
+							const min = Math.floor(v / 60);
+							const sec = Math.floor(v % 60);
+							return `${min}:${String(sec).padStart(2, "0")}`;
+						},
+					},
+					axisLine: { lineStyle: { color: "#475569" } },
+					splitLine: { show: false },
+				}
+			: {
+					type: "time" as const,
+					axisLabel: { color: "#94A3B8" },
+					axisLine: { lineStyle: { color: "#475569" } },
+					splitLine: { show: false },
+				};
 
 	return {
 		tooltip: {
@@ -66,23 +93,18 @@ export function buildChartOption(
 			textStyle: { color: "#F1F5F9" },
 		},
 		legend: {
-			data: selectedSensors.map((s) => SENSOR_META[s].label),
+			data: selectedSensors.map((key) => sensorMetaMap.get(key)?.label).filter(Boolean) as string[],
 			textStyle: { color: "#94A3B8" },
 			top: 8,
 		},
 		grid: {
 			left: 50,
-			right: selectedSensors.length > 2 ? 110 : 60,
+			right: (yAxis as unknown[]).length > 2 ? 110 : 60,
 			top: 50,
 			bottom: 80,
 			containLabel: false,
 		},
-		xAxis: {
-			type: "time",
-			axisLabel: { color: "#94A3B8" },
-			axisLine: { lineStyle: { color: "#475569" } },
-			splitLine: { show: false },
-		},
+		xAxis: xAxisConfig,
 		yAxis,
 		series,
 		dataZoom: [
@@ -96,10 +118,7 @@ export function buildChartOption(
 				fillerColor: "rgba(59, 130, 246, 0.2)",
 				textStyle: { color: "#94A3B8" },
 			},
-			{
-				type: "inside",
-				xAxisIndex: 0,
-			},
+			{ type: "inside", xAxisIndex: 0 },
 		],
 		animation: false,
 	};

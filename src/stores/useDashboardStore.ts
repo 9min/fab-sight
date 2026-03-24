@@ -1,36 +1,59 @@
-import type { SensorType } from "@/types/process";
 import { create } from "zustand";
 
+export type XAxisMode = "wallClock" | "elapsed";
+
 interface DashboardState {
+	selectedEquipmentId: string | null;
+	selectedChamberId: string | null;
 	selectedLotId: string | null;
 	selectedWaferId: string | null;
-	selectedSensors: SensorType[];
+	selectedSensors: string[];
 	isCompareMode: boolean;
 	showAnomalyOverlay: boolean;
-	dateRange: { start: string; end: string } | null;
+	showSpecLimits: boolean;
+	xAxisMode: XAxisMode;
 	selectedTimestamp: string | null;
 
-	setSelectedLot: (lotId: string, waferId: string) => void;
-	setSelectedSensors: (sensors: SensorType[]) => void;
+	setSelectedEquipment: (equipmentId: string | null) => void;
+	setSelectedChamber: (chamberId: string | null) => void;
+	setSelectedLot: (lotId: string) => void;
+	setSelectedWafer: (waferId: string | null) => void;
+	setSelectedSensors: (sensors: string[]) => void;
 	toggleCompareMode: () => void;
 	toggleAnomalyOverlay: () => void;
-	setDateRange: (range: { start: string; end: string } | null) => void;
+	toggleSpecLimits: () => void;
+	setXAxisMode: (mode: XAxisMode) => void;
 	setSelectedTimestamp: (timestamp: string | null) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
+	selectedEquipmentId: null,
+	selectedChamberId: null,
 	selectedLotId: null,
 	selectedWaferId: null,
 	selectedSensors: ["temperature", "pressure", "rfPower"],
 	isCompareMode: false,
 	showAnomalyOverlay: true,
-	dateRange: null,
+	showSpecLimits: false,
+	xAxisMode: "wallClock",
 	selectedTimestamp: null,
 
-	setSelectedLot: (lotId, waferId) => set({ selectedLotId: lotId, selectedWaferId: waferId }),
+	setSelectedEquipment: (equipmentId) =>
+		set({
+			selectedEquipmentId: equipmentId,
+			selectedChamberId: null,
+			selectedLotId: null,
+			selectedWaferId: null,
+		}),
+	setSelectedChamber: (chamberId) =>
+		set({ selectedChamberId: chamberId, selectedLotId: null, selectedWaferId: null }),
+	setSelectedLot: (lotId) =>
+		set({ selectedLotId: lotId, selectedWaferId: null, selectedTimestamp: null }),
+	setSelectedWafer: (waferId) => set({ selectedWaferId: waferId, selectedTimestamp: null }),
 	setSelectedSensors: (sensors) => set({ selectedSensors: sensors }),
 	toggleCompareMode: () => set((state) => ({ isCompareMode: !state.isCompareMode })),
 	toggleAnomalyOverlay: () => set((state) => ({ showAnomalyOverlay: !state.showAnomalyOverlay })),
-	setDateRange: (range) => set({ dateRange: range }),
+	toggleSpecLimits: () => set((state) => ({ showSpecLimits: !state.showSpecLimits })),
+	setXAxisMode: (mode) => set({ xAxisMode: mode }),
 	setSelectedTimestamp: (timestamp) => set({ selectedTimestamp: timestamp }),
 }));

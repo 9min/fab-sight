@@ -1,6 +1,7 @@
 import { RadarChart } from "@/components/charts/RadarChart";
 import { useProcessData } from "@/hooks/useProcessData";
 import { useDashboardStore } from "@/stores/useDashboardStore";
+import type { SensorMeta } from "@/types/process";
 import {
 	buildParameterTableData,
 	buildRadarData,
@@ -9,25 +10,35 @@ import {
 import { useMemo } from "react";
 import { ParameterTable } from "./ParameterTable";
 
-export function DrilldownPanel() {
+interface DrilldownPanelProps {
+	sensorsMeta: SensorMeta[];
+}
+
+export function DrilldownPanel({ sensorsMeta }: DrilldownPanelProps) {
 	const selectedLotId = useDashboardStore((s) => s.selectedLotId);
+	const selectedWaferId = useDashboardStore((s) => s.selectedWaferId);
 	const selectedTimestamp = useDashboardStore((s) => s.selectedTimestamp);
 	const { data: lotData } = useProcessData(selectedLotId);
 
+	const waferData = useMemo(() => {
+		if (!lotData?.wafers || !selectedWaferId) return undefined;
+		return lotData.wafers.find((w) => w.waferId === selectedWaferId);
+	}, [lotData, selectedWaferId]);
+
 	const dataPoint = useMemo(() => {
-		if (!lotData?.data || !selectedTimestamp) return null;
-		return findClosestDataPoint(lotData.data, selectedTimestamp);
-	}, [lotData, selectedTimestamp]);
+		if (!waferData?.data || !selectedTimestamp) return null;
+		return findClosestDataPoint(waferData.data, selectedTimestamp);
+	}, [waferData, selectedTimestamp]);
 
 	const radarData = useMemo(() => {
-		if (!dataPoint || !lotData?.data) return [];
-		return buildRadarData(dataPoint, lotData.data);
-	}, [dataPoint, lotData]);
+		if (!dataPoint || !waferData?.data) return [];
+		return buildRadarData(dataPoint, waferData.data, sensorsMeta);
+	}, [dataPoint, waferData, sensorsMeta]);
 
 	const tableData = useMemo(() => {
 		if (!dataPoint) return [];
-		return buildParameterTableData(dataPoint);
-	}, [dataPoint]);
+		return buildParameterTableData(dataPoint, sensorsMeta);
+	}, [dataPoint, sensorsMeta]);
 
 	if (!selectedTimestamp || !selectedLotId || !dataPoint) {
 		return (
@@ -48,13 +59,14 @@ export function DrilldownPanel() {
 				<span className="text-xs text-slate-500">{formattedTime}</span>
 				{dataPoint.isAnomaly && (
 					<span className="rounded bg-red-900/50 px-2 py-0.5 text-xs text-red-400">
-						이상 감지 (점수: {dataPoint.anomalyScore.toFixed(2)})
+						이상 감지 (점수: {dataPoint.anomalyScore.toFixed(2)}
+						{dataPoint.anomalyType ? ` / ${dataPoint.anomalyType}` : ""})
 					</span>
 				)}
 			</div>
 			<div className="flex flex-1 overflow-hidden">
 				<div className="flex-1 p-2">
-					<RadarChart data={radarData} />
+					<RadarChart data={radarData} sensorsMeta={sensorsMeta} />
 				</div>
 				<div className="flex-1 overflow-y-auto border-l border-slate-700 p-2">
 					<ParameterTable rows={tableData} />

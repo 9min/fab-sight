@@ -1,4 +1,3 @@
-import { SENSOR_META } from "@/types/process";
 import type { ParameterTableRow } from "@/utils/drilldownUtils";
 
 interface ParameterTableProps {
@@ -21,10 +20,7 @@ export function ParameterTable({ rows }: ParameterTableProps) {
 					<tr key={row.sensor} className="border-b border-slate-700/50">
 						<td className="px-3 py-2">
 							<span className="flex items-center gap-2">
-								<span
-									className="h-2 w-2 rounded-full"
-									style={{ backgroundColor: SENSOR_META[row.sensor].color }}
-								/>
+								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: row.color }} />
 								<span className="text-slate-200">{row.label}</span>
 							</span>
 						</td>

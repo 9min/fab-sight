@@ -1,40 +1,76 @@
-import type { ProcessDataPoint, SensorType } from "@/types/process";
+import type { ProcessDataPoint, Recipe, SensorMeta } from "@/types/process";
+import type { XAxisMode } from "@/utils/downsample";
 import ReactECharts from "echarts-for-react";
 import { memo, useMemo } from "react";
 import { buildAnomalyOverlay } from "./buildAnomalyOverlay";
 import { buildChartOption } from "./buildChartOption";
 import { buildGoldenLotOverlay } from "./buildGoldenLotOverlay";
+import { buildRecipeStepOverlay } from "./buildRecipeStepOverlay";
+import { buildSpecLimitOverlay } from "./buildSpecLimitOverlay";
 
 interface TimeSeriesChartProps {
 	data: ProcessDataPoint[];
-	selectedSensors: SensorType[];
+	selectedSensors: string[];
+	sensorsMeta: SensorMeta[];
 	showAnomalyOverlay?: boolean;
+	showSpecLimits?: boolean;
 	goldenData?: ProcessDataPoint[];
 	isCompareMode?: boolean;
+	recipe?: Recipe;
+	xAxisMode?: XAxisMode;
+	waferStartTime?: string;
 	onTimestampClick?: (timestamp: string) => void;
 }
 
 export const TimeSeriesChart = memo(function TimeSeriesChart({
 	data,
 	selectedSensors,
+	sensorsMeta,
 	showAnomalyOverlay = false,
+	showSpecLimits = false,
 	goldenData,
 	isCompareMode = false,
+	recipe,
+	xAxisMode = "wallClock",
+	waferStartTime,
 	onTimestampClick,
 }: TimeSeriesChartProps) {
 	const option = useMemo(() => {
-		const baseOption = buildChartOption(data, selectedSensors);
-		const overlaySeries = buildAnomalyOverlay(data, showAnomalyOverlay);
-		const goldenSeries = buildGoldenLotOverlay(goldenData ?? [], selectedSensors, isCompareMode);
+		const baseOption = buildChartOption(data, selectedSensors, sensorsMeta, xAxisMode);
+		const primarySensor = selectedSensors[0] ?? "temperature";
+		const overlaySeries = buildAnomalyOverlay(data, showAnomalyOverlay, primarySensor, xAxisMode);
+		const goldenSeries = buildGoldenLotOverlay(
+			goldenData ?? [],
+			selectedSensors,
+			sensorsMeta,
+			isCompareMode,
+			xAxisMode,
+		);
+		const stepSeries = buildRecipeStepOverlay(recipe, xAxisMode, waferStartTime);
+		const specSeries = buildSpecLimitOverlay(selectedSensors, sensorsMeta, showSpecLimits);
 
 		const baseSeries = Array.isArray(baseOption.series) ? baseOption.series : [];
-		const allSeries = [...baseSeries, ...overlaySeries, ...goldenSeries];
+		const allSeries = [
+			...baseSeries,
+			...overlaySeries,
+			...goldenSeries,
+			...stepSeries,
+			...specSeries,
+		];
 
-		return {
-			...baseOption,
-			series: allSeries,
-		};
-	}, [data, selectedSensors, showAnomalyOverlay, goldenData, isCompareMode]);
+		return { ...baseOption, series: allSeries };
+	}, [
+		data,
+		selectedSensors,
+		sensorsMeta,
+		showAnomalyOverlay,
+		showSpecLimits,
+		goldenData,
+		isCompareMode,
+		recipe,
+		xAxisMode,
+		waferStartTime,
+	]);
 
 	const onEvents = useMemo(() => {
 		if (!onTimestampClick) return undefined;

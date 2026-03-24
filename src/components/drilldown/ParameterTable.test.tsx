@@ -4,9 +4,30 @@ import { describe, expect, it } from "vitest";
 import { ParameterTable } from "./ParameterTable";
 
 const mockRows: ParameterTableRow[] = [
-	{ sensor: "temperature", label: "Temperature", value: 550, unit: "°C", status: "normal" },
-	{ sensor: "pressure", label: "Pressure", value: 8.5, unit: "Torr", status: "anomaly" },
-	{ sensor: "rfPower", label: "RF Power", value: 1500, unit: "W", status: "normal" },
+	{
+		sensor: "temperature",
+		label: "Temperature",
+		value: 550,
+		unit: "°C",
+		color: "#EF4444",
+		status: "normal",
+	},
+	{
+		sensor: "pressure",
+		label: "Pressure",
+		value: 8.5,
+		unit: "Torr",
+		color: "#3B82F6",
+		status: "anomaly",
+	},
+	{
+		sensor: "rfPower",
+		label: "RF Power",
+		value: 1500,
+		unit: "W",
+		color: "#F59E0B",
+		status: "normal",
+	},
 ];
 
 describe("ParameterTable", () => {
