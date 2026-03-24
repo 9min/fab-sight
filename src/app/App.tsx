@@ -4,6 +4,9 @@ import { AnomalyToggle } from "@/components/ui/AnomalyToggle";
 import { CompareToggle } from "@/components/ui/CompareToggle";
 import { LotSelector } from "@/components/ui/LotSelector";
 import { SensorCheckboxGroup } from "@/components/ui/SensorCheckbox";
+import { SpecLimitToggle } from "@/components/ui/SpecLimitToggle";
+import { WaferSelector } from "@/components/ui/WaferSelector";
+import { XAxisModeToggle } from "@/components/ui/XAxisModeToggle";
 import { getSensorsForProcess } from "@/constants/sensorConfig";
 import { useProcessData } from "@/hooks/useProcessData";
 import { queryClient } from "@/lib/queryClient";
@@ -29,6 +32,7 @@ function AppContent() {
 			navControls={
 				<>
 					<LotSelector />
+					<WaferSelector />
 					<CompareToggle />
 				</>
 			}
@@ -45,6 +49,15 @@ function AppContent() {
 							AI 이상 탐지
 						</h2>
 						<AnomalyToggle />
+					</div>
+					<div className="border-t border-slate-700 pt-4">
+						<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+							차트 옵션
+						</h2>
+						<div className="flex flex-col gap-2">
+							<SpecLimitToggle />
+							<XAxisModeToggle />
+						</div>
 					</div>
 				</>
 			}
