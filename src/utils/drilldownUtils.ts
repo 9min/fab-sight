@@ -1,7 +1,4 @@
-import type { ProcessDataPoint, SensorType } from "@/types/process";
-import { SENSOR_META } from "@/types/process";
-
-const SENSORS: SensorType[] = ["temperature", "pressure", "rfPower"];
+import type { ProcessDataPoint, SensorMeta } from "@/types/process";
 
 /** 가장 가까운 타임스탬프의 데이터 포인트를 찾는다 (이진 탐색) */
 export function findClosestDataPoint(
@@ -26,7 +23,6 @@ export function findClosestDataPoint(
 		}
 	}
 
-	// left가 가장 가까운 후보. left-1도 확인
 	if (left === 0) return data[0];
 
 	const prevDiff = Math.abs(new Date(data[left - 1].timestamp).getTime() - targetTime);
@@ -36,7 +32,7 @@ export function findClosestDataPoint(
 }
 
 export interface RadarDataItem {
-	sensor: SensorType;
+	sensor: string;
 	label: string;
 	value: number;
 	max: number;
@@ -46,35 +42,41 @@ export interface RadarDataItem {
 export function buildRadarData(
 	point: ProcessDataPoint,
 	allData: ProcessDataPoint[],
+	sensorsMeta: SensorMeta[],
 ): RadarDataItem[] {
-	return SENSORS.map((sensor) => {
-		const values = allData.map((p) => p[sensor]);
+	return sensorsMeta.map((meta) => {
+		const values = allData.map((p) => p.sensors[meta.key] ?? 0);
 		const max = Math.max(...values);
 
 		return {
-			sensor,
-			label: SENSOR_META[sensor].label,
-			value: point[sensor],
+			sensor: meta.key,
+			label: meta.label,
+			value: point.sensors[meta.key] ?? 0,
 			max: max * 1.1,
 		};
 	});
 }
 
 export interface ParameterTableRow {
-	sensor: SensorType;
+	sensor: string;
 	label: string;
 	value: number;
 	unit: string;
+	color: string;
 	status: "normal" | "anomaly";
 }
 
 /** 파라미터 테이블용 데이터를 생성한다 */
-export function buildParameterTableData(point: ProcessDataPoint): ParameterTableRow[] {
-	return SENSORS.map((sensor) => ({
-		sensor,
-		label: SENSOR_META[sensor].label,
-		value: point[sensor],
-		unit: SENSOR_META[sensor].unit,
+export function buildParameterTableData(
+	point: ProcessDataPoint,
+	sensorsMeta: SensorMeta[],
+): ParameterTableRow[] {
+	return sensorsMeta.map((meta) => ({
+		sensor: meta.key,
+		label: meta.label,
+		value: point.sensors[meta.key] ?? 0,
+		unit: meta.unit,
+		color: meta.color,
 		status: point.isAnomaly ? "anomaly" : "normal",
 	}));
 }
