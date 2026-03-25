@@ -3,6 +3,36 @@ import type { SensorMeta, WaferRun } from "@/types/process";
 import { type XAxisMode, extractSensorSeries, lttbDownsample } from "@/utils/downsample";
 import type { SeriesOption } from "echarts";
 
+function buildWaferSensorSeries(
+	wafer: WaferRun,
+	sensorKey: string,
+	sensorMetaMap: Map<string, SensorMeta>,
+	unitToAxisIndex: Map<string, number>,
+	xAxisMode: XAxisMode,
+): SeriesOption | null {
+	const meta = sensorMetaMap.get(sensorKey);
+	if (!meta) return null;
+
+	let seriesData = extractSensorSeries(wafer.data, sensorKey, xAxisMode);
+	if (seriesData.length > DOWNSAMPLE_THRESHOLD) {
+		seriesData = lttbDownsample(seriesData, DOWNSAMPLE_TARGET);
+	}
+
+	const axisIndex = unitToAxisIndex.get(meta.unit) ?? 0;
+
+	return {
+		name: `${wafer.waferId} ${meta.label}`,
+		type: "line",
+		yAxisIndex: axisIndex,
+		showSymbol: false,
+		clip: true,
+		lineStyle: { color: meta.color, width: 1, opacity: 0.35 },
+		itemStyle: { color: meta.color },
+		data: seriesData.map((p) => [p.x, p.y]),
+		z: 0,
+	} satisfies SeriesOption;
+}
+
 /** Wafer-to-Wafer 비교 오버레이를 생성한다 */
 export function buildWaferCompareOverlay(
 	wafers: WaferRun[],
@@ -30,27 +60,8 @@ export function buildWaferCompareOverlay(
 
 	for (const wafer of otherWafers) {
 		for (const sensorKey of selectedSensors) {
-			const meta = sensorMetaMap.get(sensorKey);
-			if (!meta) continue;
-
-			let seriesData = extractSensorSeries(wafer.data, sensorKey, xAxisMode);
-			if (seriesData.length > DOWNSAMPLE_THRESHOLD) {
-				seriesData = lttbDownsample(seriesData, DOWNSAMPLE_TARGET);
-			}
-
-			const axisIndex = unitToAxisIndex.get(meta.unit) ?? 0;
-
-			series.push({
-				name: `${wafer.waferId} ${meta.label}`,
-				type: "line",
-				yAxisIndex: axisIndex,
-				showSymbol: false,
-				clip: true,
-				lineStyle: { color: meta.color, width: 1, opacity: 0.35 },
-				itemStyle: { color: meta.color },
-				data: seriesData.map((p) => [p.x, p.y]),
-				z: 0,
-			} satisfies SeriesOption);
+			const s = buildWaferSensorSeries(wafer, sensorKey, sensorMetaMap, unitToAxisIndex, xAxisMode);
+			if (s) series.push(s);
 		}
 	}
 
