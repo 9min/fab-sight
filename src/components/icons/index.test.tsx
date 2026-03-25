@@ -34,6 +34,6 @@ describe("아이콘 컴포넌트", () => {
 	it("className prop이 전달된다", () => {
 		render(<InfoIcon data-testid="icon" className="h-5 w-5 text-red-500" />);
 		const svg = screen.getByTestId("icon");
-		expect(svg.className.baseVal).toContain("h-5 w-5 text-red-500");
+		expect(svg.getAttribute("class")).toContain("h-5 w-5 text-red-500");
 	});
 });
