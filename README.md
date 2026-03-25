@@ -118,12 +118,21 @@ src/
 |------|------|
 | [CLAUDE.md](CLAUDE.md) | 개발 규칙 및 코딩 컨벤션 |
 | [docs/prd.md](docs/prd.md) | 제품 요구사항 문서 (PRD) |
+| [docs/git-workflow.md](docs/git-workflow.md) | Git 워크플로우 및 브랜치 전략 |
+| [docs/commit-convention.md](docs/commit-convention.md) | 커밋 메시지 컨벤션 |
 | [docs/project-structure.md](docs/project-structure.md) | 프로젝트 폴더 구조 가이드 |
-| [docs/design-guide.md](docs/design-guide.md) | 디자인 시스템 |
-| [docs/testing-guide.md](docs/testing-guide.md) | 테스트 가이드 |
-| [docs/dev-environment.md](docs/dev-environment.md) | 개발 환경 셋업 |
-| [docs/git-workflow.md](docs/git-workflow.md) | Git 워크플로우 |
+| [docs/lint-config.md](docs/lint-config.md) | Biome 린트/포매팅 설정 |
+| [docs/design-guide.md](docs/design-guide.md) | 디자인 가이드 (UI 컨벤션 + 디자인 시스템) |
+| [docs/testing-guide.md](docs/testing-guide.md) | 테스트 코드 가이드 |
 | [docs/security-guide.md](docs/security-guide.md) | 보안 가이드 |
+| [docs/cicd-guide.md](docs/cicd-guide.md) | CI/CD 설정 가이드 |
+| [docs/code-review-checklist.md](docs/code-review-checklist.md) | 코드 리뷰 체크리스트 |
+| [docs/error-handling.md](docs/error-handling.md) | 에러 핸들링 가이드 |
+| [docs/dev-environment.md](docs/dev-environment.md) | 개발 환경 셋업 가이드 |
+| [docs/state-management.md](docs/state-management.md) | 상태 관리 전략 |
+| [docs/performance-guide.md](docs/performance-guide.md) | 성능 최적화 가이드 |
+| [docs/data-modeling.md](docs/data-modeling.md) | 데이터 모델링 가이드 |
+| [docs/maintainability-guide.md](docs/maintainability-guide.md) | 유지보수 가이드 (아키텍처·설계 원칙) |
 
 ## 라이선스
 
