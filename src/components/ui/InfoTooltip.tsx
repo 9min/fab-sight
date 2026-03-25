@@ -132,6 +132,9 @@ export const InfoTooltip = memo(function InfoTooltip({ termId }: InfoTooltipProp
 		<>
 			<span
 				ref={iconRef}
+				// biome-ignore lint/a11y/useSemanticElements: 부모가 <button>인 경우 중첩 불가하므로 span+role 사용
+				role="button"
+				tabIndex={0}
 				onClick={handleToggle}
 				onKeyDown={handleKeyDown}
 				aria-label={`${term.term} 설명 보기`}
@@ -154,13 +157,13 @@ export const InfoTooltip = memo(function InfoTooltip({ termId }: InfoTooltipProp
 					>
 						<div className="mb-1 font-medium text-slate-100">{term.term}</div>
 						<p className="text-slate-300">{term.shortDescription}</p>
-						{/* biome-ignore lint/a11y/useKeyWithClickEvents: 팝오버 내 보조 액션 */}
-						<span
+						<button
+							type="button"
 							onClick={handleDetailClick}
-							className="mt-2 block cursor-pointer text-xs text-blue-400 transition-colors hover:text-blue-300"
+							className="mt-2 block text-xs text-blue-400 transition-colors hover:text-blue-300"
 						>
 							자세히 보기
-						</span>
+						</button>
 					</div>,
 					document.body,
 				)}

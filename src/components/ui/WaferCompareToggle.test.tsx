@@ -11,14 +11,14 @@ describe("WaferCompareToggle", () => {
 
 	it("버튼이 렌더링된다", () => {
 		render(<WaferCompareToggle />);
-		expect(screen.getByRole("button")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "W2W 비교" })).toBeInTheDocument();
 	});
 
 	it("클릭하면 isWaferCompareMode가 true로 변경된다", async () => {
 		const user = userEvent.setup();
 		render(<WaferCompareToggle />);
 
-		await user.click(screen.getByRole("button"));
+		await user.click(screen.getByRole("button", { name: "W2W 비교" }));
 		expect(useDashboardStore.getState().isWaferCompareMode).toBe(true);
 	});
 
@@ -26,7 +26,7 @@ describe("WaferCompareToggle", () => {
 		const user = userEvent.setup();
 		render(<WaferCompareToggle />);
 
-		const btn = screen.getByRole("button");
+		const btn = screen.getByRole("button", { name: "W2W 비교" });
 		await user.click(btn);
 		await user.click(btn);
 		expect(useDashboardStore.getState().isWaferCompareMode).toBe(false);
