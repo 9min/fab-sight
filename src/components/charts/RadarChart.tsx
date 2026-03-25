@@ -13,11 +13,13 @@ export const RadarChart = memo(function RadarChart({ data, sensorsMeta }: RadarC
 	const option = useMemo(() => buildRadarOption(data, sensorsMeta), [data, sensorsMeta]);
 
 	return (
-		<ReactECharts
-			option={option}
-			style={{ height: "100%", width: "100%" }}
-			opts={{ renderer: "canvas" }}
-			notMerge={true}
-		/>
+		<div role="img" aria-label="센서 값 방사형 차트" style={{ height: "100%", width: "100%" }}>
+			<ReactECharts
+				option={option}
+				style={{ height: "100%", width: "100%" }}
+				opts={{ renderer: "canvas" }}
+				notMerge={true}
+			/>
+		</div>
 	);
 });
