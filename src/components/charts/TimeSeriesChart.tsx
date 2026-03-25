@@ -104,12 +104,14 @@ export const TimeSeriesChart = memo(function TimeSeriesChart({
 	}, [onTimestampClick]);
 
 	return (
-		<ReactECharts
-			option={option}
-			style={{ height: "100%", width: "100%" }}
-			onEvents={onEvents}
-			notMerge={true}
-			opts={{ renderer: "canvas" }}
-		/>
+		<div role="img" aria-label="시계열 센서 데이터 차트" style={{ height: "100%", width: "100%" }}>
+			<ReactECharts
+				option={option}
+				style={{ height: "100%", width: "100%" }}
+				onEvents={onEvents}
+				notMerge={true}
+				opts={{ renderer: "canvas" }}
+			/>
+		</div>
 	);
 });

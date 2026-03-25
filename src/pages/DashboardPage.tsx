@@ -43,7 +43,7 @@ export function DashboardPage() {
 		}
 	}, [selectedLotId, filteredLots, setSelectedLot]);
 
-	const { data: lotData, isLoading } = useProcessData(selectedLotId);
+	const { data: lotData, isLoading, error } = useProcessData(selectedLotId);
 	const { data: goldenLotData } = useGoldenLotData(isCompareMode);
 
 	// Lot 선택 시 첫 번째 Wafer 자동 선택 + 센서 목록 업데이트
@@ -93,6 +93,10 @@ export function DashboardPage() {
 
 	if (!selectedLotId) {
 		return <EmptyState message="Lot을 선택해주세요" />;
+	}
+
+	if (error) {
+		return <EmptyState message="데이터 로딩에 실패했습니다" />;
 	}
 
 	if (isLoading) {

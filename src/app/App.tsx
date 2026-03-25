@@ -6,6 +6,7 @@ import { AnomalyToggle } from "@/components/ui/AnomalyToggle";
 import { ChamberSelector } from "@/components/ui/ChamberSelector";
 import { CompareToggle } from "@/components/ui/CompareToggle";
 import { EquipmentSelector } from "@/components/ui/EquipmentSelector";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { LotSelector } from "@/components/ui/LotSelector";
 import { SensorCheckboxGroup } from "@/components/ui/SensorCheckbox";
 import { SpecLimitToggle } from "@/components/ui/SpecLimitToggle";
@@ -82,7 +83,9 @@ function AppContent() {
 export function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
-			<AppContent />
+			<ErrorBoundary>
+				<AppContent />
+			</ErrorBoundary>
 		</QueryClientProvider>
 	);
 }
