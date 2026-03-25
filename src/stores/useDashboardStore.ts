@@ -14,6 +14,7 @@ interface DashboardState {
 	showSpecLimits: boolean;
 	xAxisMode: XAxisMode;
 	selectedTimestamp: string | null;
+	isSidebarOpen: boolean;
 
 	setSelectedEquipment: (equipmentId: string | null) => void;
 	setSelectedChamber: (chamberId: string | null) => void;
@@ -26,6 +27,7 @@ interface DashboardState {
 	toggleSpecLimits: () => void;
 	setXAxisMode: (mode: XAxisMode) => void;
 	setSelectedTimestamp: (timestamp: string | null) => void;
+	toggleSidebar: () => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
@@ -40,6 +42,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 	showSpecLimits: false,
 	xAxisMode: "wallClock",
 	selectedTimestamp: null,
+	isSidebarOpen: false,
 
 	setSelectedEquipment: (equipmentId) =>
 		set({
@@ -60,4 +63,5 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 	toggleSpecLimits: () => set((state) => ({ showSpecLimits: !state.showSpecLimits })),
 	setXAxisMode: (mode) => set({ xAxisMode: mode }),
 	setSelectedTimestamp: (timestamp) => set({ selectedTimestamp: timestamp }),
+	toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
 }));

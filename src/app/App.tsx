@@ -1,4 +1,6 @@
 import { DrilldownPanel } from "@/components/drilldown/DrilldownPanel";
+import { GlossaryButton } from "@/components/glossary/GlossaryButton";
+import { GlossaryDrawer } from "@/components/glossary/GlossaryDrawer";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AnomalyToggle } from "@/components/ui/AnomalyToggle";
 import { ChamberSelector } from "@/components/ui/ChamberSelector";
@@ -31,45 +33,49 @@ function AppContent() {
 	}, [lotData]);
 
 	return (
-		<DashboardLayout
-			navControls={
-				<>
-					<EquipmentSelector />
-					<ChamberSelector />
-					<LotSelector />
-					<WaferSelector />
-					<CompareToggle />
-				</>
-			}
-			sidebarContent={
-				<>
-					<div>
-						<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-							센서 선택
-						</h2>
-						<SensorCheckboxGroup sensorsMeta={sensorsMeta} />
-					</div>
-					<div className="border-t border-slate-700 pt-4">
-						<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-							AI 이상 탐지
-						</h2>
-						<AnomalyToggle />
-					</div>
-					<div className="border-t border-slate-700 pt-4">
-						<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-							차트 옵션
-						</h2>
-						<div className="flex flex-col gap-2">
-							<SpecLimitToggle />
-							<WaferCompareToggle />
-							<XAxisModeToggle />
+		<>
+			<DashboardLayout
+				navControls={
+					<>
+						<EquipmentSelector />
+						<ChamberSelector />
+						<LotSelector />
+						<WaferSelector />
+						<CompareToggle />
+						<GlossaryButton />
+					</>
+				}
+				sidebarContent={
+					<>
+						<div>
+							<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+								센서 선택
+							</h2>
+							<SensorCheckboxGroup sensorsMeta={sensorsMeta} />
 						</div>
-					</div>
-				</>
-			}
-			chartArea={<DashboardPage />}
-			drilldownArea={<DrilldownPanel sensorsMeta={sensorsMeta} />}
-		/>
+						<div className="border-t border-slate-700 pt-4">
+							<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+								AI 이상 탐지
+							</h2>
+							<AnomalyToggle />
+						</div>
+						<div className="border-t border-slate-700 pt-4">
+							<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+								차트 옵션
+							</h2>
+							<div className="flex flex-col gap-2">
+								<SpecLimitToggle />
+								<WaferCompareToggle />
+								<XAxisModeToggle />
+							</div>
+						</div>
+					</>
+				}
+				chartArea={<DashboardPage />}
+				drilldownArea={<DrilldownPanel sensorsMeta={sensorsMeta} />}
+			/>
+			<GlossaryDrawer />
+		</>
 	);
 }
 

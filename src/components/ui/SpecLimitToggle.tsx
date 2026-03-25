@@ -1,3 +1,5 @@
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
+import { ToggleButton } from "@/components/ui/ToggleButton";
 import { useDashboardStore } from "@/stores/useDashboardStore";
 
 export function SpecLimitToggle() {
@@ -5,18 +7,13 @@ export function SpecLimitToggle() {
 	const toggleSpecLimits = useDashboardStore((s) => s.toggleSpecLimits);
 
 	return (
-		<button
-			type="button"
+		<ToggleButton
+			variant="pill"
+			isActive={showSpecLimits}
 			onClick={toggleSpecLimits}
-			className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors ${
-				showSpecLimits
-					? "bg-blue-500/20 text-blue-400"
-					: "bg-slate-700 text-slate-400 hover:text-slate-300"
-			}`}
-			aria-label="Spec Limit 표시"
+			label="Spec Limit"
 		>
-			<span className={`h-2 w-2 rounded-full ${showSpecLimits ? "bg-blue-400" : "bg-slate-500"}`} />
-			Spec Limit
-		</button>
+			<InfoTooltip termId="specLimit" />
+		</ToggleButton>
 	);
 }

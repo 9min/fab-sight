@@ -11,7 +11,7 @@ describe("CompareToggle", () => {
 
 	it("버튼이 렌더링된다", () => {
 		render(<CompareToggle />);
-		expect(screen.getByRole("button")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Golden Lot 비교" })).toBeInTheDocument();
 	});
 
 	it("Golden Lot 비교 텍스트가 표시된다", () => {
@@ -21,7 +21,7 @@ describe("CompareToggle", () => {
 
 	it("초기 상태에서 비활성 스타일이다", () => {
 		render(<CompareToggle />);
-		const button = screen.getByRole("button");
+		const button = screen.getByRole("button", { name: "Golden Lot 비교" });
 		expect(button.getAttribute("aria-pressed")).toBe("false");
 	});
 
@@ -29,7 +29,7 @@ describe("CompareToggle", () => {
 		const user = userEvent.setup();
 		render(<CompareToggle />);
 
-		await user.click(screen.getByRole("button"));
+		await user.click(screen.getByRole("button", { name: "Golden Lot 비교" }));
 
 		const state = useDashboardStore.getState();
 		expect(state.isCompareMode).toBe(true);
@@ -38,7 +38,7 @@ describe("CompareToggle", () => {
 	it("isCompareMode가 true이면 활성 스타일이다", () => {
 		useDashboardStore.setState({ isCompareMode: true });
 		render(<CompareToggle />);
-		const button = screen.getByRole("button");
+		const button = screen.getByRole("button", { name: "Golden Lot 비교" });
 		expect(button.getAttribute("aria-pressed")).toBe("true");
 	});
 });

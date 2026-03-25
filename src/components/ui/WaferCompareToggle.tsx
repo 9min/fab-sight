@@ -1,3 +1,5 @@
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
+import { ToggleButton } from "@/components/ui/ToggleButton";
 import { useDashboardStore } from "@/stores/useDashboardStore";
 
 export function WaferCompareToggle() {
@@ -5,20 +7,13 @@ export function WaferCompareToggle() {
 	const toggleWaferCompareMode = useDashboardStore((s) => s.toggleWaferCompareMode);
 
 	return (
-		<button
-			type="button"
+		<ToggleButton
+			variant="pill"
+			isActive={isWaferCompareMode}
 			onClick={toggleWaferCompareMode}
-			className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors ${
-				isWaferCompareMode
-					? "bg-blue-500/20 text-blue-400"
-					: "bg-slate-700 text-slate-400 hover:text-slate-300"
-			}`}
-			aria-label="W2W 비교"
+			label="W2W 비교"
 		>
-			<span
-				className={`h-2 w-2 rounded-full ${isWaferCompareMode ? "bg-blue-400" : "bg-slate-500"}`}
-			/>
-			W2W 비교
-		</button>
+			<InfoTooltip termId="w2wCompare" />
+		</ToggleButton>
 	);
 }
