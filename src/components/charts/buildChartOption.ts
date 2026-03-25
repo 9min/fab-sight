@@ -27,7 +27,7 @@ export function buildChartOption(
 				scale: true,
 				name: meta.unit,
 				position: axisIndex === 0 ? ("left" as const) : ("right" as const),
-				offset: axisIndex <= 1 ? 0 : (axisIndex - 1) * 50,
+				offset: axisIndex <= 1 ? 0 : (axisIndex - 1) * 60,
 				axisLine: { show: true, lineStyle: { color: meta.color } },
 				axisLabel: { color: meta.color },
 				splitLine: { show: axisIndex === 0, lineStyle: { color: "#334155" } },
@@ -99,7 +99,7 @@ export function buildChartOption(
 		},
 		grid: {
 			left: 50,
-			right: (yAxis as unknown[]).length > 2 ? 110 : 60,
+			right: Math.max(60, ((yAxis as unknown[]).length - 1) * 60 + 20),
 			top: 50,
 			bottom: 80,
 			containLabel: false,

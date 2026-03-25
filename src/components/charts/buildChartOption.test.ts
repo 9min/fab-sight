@@ -62,6 +62,22 @@ describe("buildChartOption", () => {
 		expect(series).toHaveLength(1);
 	});
 
+	it("Y축 개수에 따라 grid right가 동적으로 계산된다", () => {
+		// 1축: max(60, 0*60+20) = 60
+		const opt1 = buildChartOption(mockData, ["temperature"], MOCK_SENSORS_META);
+		const grid1 = opt1.grid as Record<string, unknown>;
+		expect(grid1.right).toBe(60);
+
+		// 3축 (°C, Torr, W): max(60, 2*60+20) = 140
+		const opt3 = buildChartOption(
+			mockData,
+			["temperature", "pressure", "rfPower"],
+			MOCK_SENSORS_META,
+		);
+		const grid3 = opt3.grid as Record<string, unknown>;
+		expect(grid3.right).toBe(140);
+	});
+
 	it("빈 센서 목록으로도 옵션을 생성할 수 있다", () => {
 		const option = buildChartOption(mockData, [], MOCK_SENSORS_META);
 		expect(option).toBeDefined();
