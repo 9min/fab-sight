@@ -6,10 +6,10 @@ describe("MOCK_LOTS_V3", () => {
 		expect(MOCK_LOTS_V3).toHaveLength(4);
 	});
 
-	it("각 Lot에 wafers 배열이 존재하고 3개의 Wafer를 포함한다", () => {
+	it("각 Lot에 wafers 배열이 존재하고 6개의 Wafer를 포함한다", () => {
 		for (const lot of MOCK_LOTS_V3) {
 			expect(lot.wafers).toBeDefined();
-			expect(lot.wafers).toHaveLength(3);
+			expect(lot.wafers).toHaveLength(6);
 		}
 	});
 

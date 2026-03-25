@@ -12,12 +12,15 @@ export default defineConfig({
 	},
 	build: {
 		chunkSizeWarningLimit: 1100,
-		rollupOptions: {
+		rolldownOptions: {
 			output: {
-				manualChunks(id) {
-					if (id.includes("echarts")) {
-						return "echarts";
-					}
+				codeSplitting: {
+					groups: [
+						{
+							name: "echarts",
+							test: /echarts/,
+						},
+					],
 				},
 			},
 		},

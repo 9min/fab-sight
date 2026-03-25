@@ -48,6 +48,8 @@ export interface SpecLimits {
 	lsl?: number;
 	ucl?: number;
 	lcl?: number;
+	/** Spec이 적용되는 주요 공정 스텝 (예: "Deposition", "Etch Phase") */
+	stepContext?: string;
 }
 
 /** 센서 메타데이터 */

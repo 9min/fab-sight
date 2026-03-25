@@ -1,7 +1,11 @@
 import type { SensorMeta, SpecLimits } from "@/types/process";
 import type { SeriesOption } from "echarts";
 
-type LimitLine = { yAxis: number; name: string; lineStyle: { color: string; type: "dashed" } };
+interface LimitLine {
+	yAxis: number;
+	name: string;
+	lineStyle: { color: string; type: "dashed" };
+}
 
 const LIMIT_DEFS: { key: keyof SpecLimits; suffix: string; color: string }[] = [
 	{ key: "usl", suffix: "USL", color: "#DC2626" },
@@ -10,14 +14,16 @@ const LIMIT_DEFS: { key: keyof SpecLimits; suffix: string; color: string }[] = [
 	{ key: "lcl", suffix: "LCL", color: "#F59E0B" },
 ];
 
+/** Spec Limit 정의에서 markLine 데이터를 생성한다 */
 function buildLimitLines(label: string, limits: SpecLimits): LimitLine[] {
+	const stepSuffix = limits.stepContext ? ` @${limits.stepContext}` : "";
 	const lines: LimitLine[] = [];
 	for (const def of LIMIT_DEFS) {
 		const value = limits[def.key];
-		if (value !== undefined) {
+		if (typeof value === "number") {
 			lines.push({
 				yAxis: value,
-				name: `${label} ${def.suffix}`,
+				name: `${label} ${def.suffix}${stepSuffix}`,
 				lineStyle: { color: def.color, type: "dashed" },
 			});
 		}

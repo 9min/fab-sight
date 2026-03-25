@@ -3,6 +3,7 @@ import type { SensorMeta, WaferRun } from "@/types/process";
 import { type XAxisMode, extractSensorSeries, lttbDownsample } from "@/utils/downsample";
 import type { SeriesOption } from "echarts";
 
+/** 단일 Wafer × 센서 조합의 비교 시리즈를 생성한다 */
 function buildWaferSensorSeries(
 	wafer: WaferRun,
 	sensorKey: string,
@@ -60,8 +61,14 @@ export function buildWaferCompareOverlay(
 
 	for (const wafer of otherWafers) {
 		for (const sensorKey of selectedSensors) {
-			const s = buildWaferSensorSeries(wafer, sensorKey, sensorMetaMap, unitToAxisIndex, xAxisMode);
-			if (s) series.push(s);
+			const result = buildWaferSensorSeries(
+				wafer,
+				sensorKey,
+				sensorMetaMap,
+				unitToAxisIndex,
+				xAxisMode,
+			);
+			if (result) series.push(result);
 		}
 	}
 
