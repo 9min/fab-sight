@@ -37,7 +37,7 @@ export function buildRecipeStepOverlay(
 				lineStyle: { color: "rgba(148, 163, 184, 0.3)", type: "dashed", width: 1 },
 				label: {
 					show: true,
-					position: "start",
+					position: "insideStartTop",
 					color: "#94A3B8",
 					fontSize: 10,
 					formatter: (params: { name?: string }) => params.name ?? "",
