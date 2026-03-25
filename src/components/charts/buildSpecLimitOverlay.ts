@@ -1,5 +1,35 @@
-import type { SensorMeta } from "@/types/process";
+import type { SensorMeta, SpecLimits } from "@/types/process";
 import type { SeriesOption } from "echarts";
+
+interface LimitLine {
+	yAxis: number;
+	name: string;
+	lineStyle: { color: string; type: "dashed" };
+}
+
+const LIMIT_DEFS: { key: keyof SpecLimits; suffix: string; color: string }[] = [
+	{ key: "usl", suffix: "USL", color: "#DC2626" },
+	{ key: "lsl", suffix: "LSL", color: "#DC2626" },
+	{ key: "ucl", suffix: "UCL", color: "#F59E0B" },
+	{ key: "lcl", suffix: "LCL", color: "#F59E0B" },
+];
+
+/** Spec Limit 정의에서 markLine 데이터를 생성한다 */
+function buildLimitLines(label: string, limits: SpecLimits): LimitLine[] {
+	const stepSuffix = limits.stepContext ? ` @${limits.stepContext}` : "";
+	const lines: LimitLine[] = [];
+	for (const def of LIMIT_DEFS) {
+		const value = limits[def.key];
+		if (typeof value === "number") {
+			lines.push({
+				yAxis: value,
+				name: `${label} ${def.suffix}${stepSuffix}`,
+				lineStyle: { color: def.color, type: "dashed" },
+			});
+		}
+	}
+	return lines;
+}
 
 /** Spec Limit 수평선 오버레이를 생성한다 */
 export function buildSpecLimitOverlay(
@@ -27,41 +57,7 @@ export function buildSpecLimitOverlay(
 		if (!meta?.specLimits) continue;
 
 		const axisIndex = unitToAxisIndex.get(meta.unit) ?? 0;
-		const limits = meta.specLimits;
-		const markLineData: {
-			yAxis: number;
-			name: string;
-			lineStyle: { color: string; type: "dashed" };
-		}[] = [];
-
-		if (limits.usl !== undefined) {
-			markLineData.push({
-				yAxis: limits.usl,
-				name: `${meta.label} USL`,
-				lineStyle: { color: "#DC2626", type: "dashed" },
-			});
-		}
-		if (limits.lsl !== undefined) {
-			markLineData.push({
-				yAxis: limits.lsl,
-				name: `${meta.label} LSL`,
-				lineStyle: { color: "#DC2626", type: "dashed" },
-			});
-		}
-		if (limits.ucl !== undefined) {
-			markLineData.push({
-				yAxis: limits.ucl,
-				name: `${meta.label} UCL`,
-				lineStyle: { color: "#F59E0B", type: "dashed" },
-			});
-		}
-		if (limits.lcl !== undefined) {
-			markLineData.push({
-				yAxis: limits.lcl,
-				name: `${meta.label} LCL`,
-				lineStyle: { color: "#F59E0B", type: "dashed" },
-			});
-		}
+		const markLineData = buildLimitLines(meta.label, meta.specLimits);
 
 		if (markLineData.length > 0) {
 			series.push({

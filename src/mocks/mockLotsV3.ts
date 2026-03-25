@@ -4,7 +4,7 @@ import { MOCK_EQUIPMENT } from "./equipment";
 import { generateWaferRuns } from "./generateProcessDataV3";
 import { RECIPE_CVD_STANDARD, RECIPE_ETCH_DEEP } from "./recipes";
 
-const WAFER_COUNT = 3;
+const WAFER_COUNT = 6;
 
 interface LotConfig {
 	lotId: string;

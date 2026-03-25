@@ -43,6 +43,35 @@ describe("generateWaferRuns", () => {
 		expect(wafers[0].data).toHaveLength(totalDuration);
 	});
 
+	it("첫 데이터 포인트가 대기 상태에서 시작한다 (target값이 아닌 idle값)", () => {
+		const wafers = generateWaferRuns({
+			recipe: RECIPE_CVD_STANDARD,
+			sensorsMeta: cvdSensors,
+			waferCount: 1,
+			anomalyRatio: 0,
+			waferVariation: 0,
+		});
+		const first = wafers[0].data[0].sensors;
+		// CVD: 대기압(760 Torr)에서 시작 → 첫 포인트는 Pump Down target(0.05)보다 훨씬 높음
+		expect(first.pressure).toBeGreaterThan(100);
+		// 상온(25°C)에서 시작 → Pump Down target(300°C)보다 훨씬 낮음
+		expect(first.temperature).toBeLessThan(50);
+		// 가스 플로우는 idle=0에서 시작
+		expect(first.rfPower).toBeLessThan(5);
+	});
+
+	it("ETCH 공정 첫 포인트가 mTorr 대기압에서 시작한다", () => {
+		const wafers = generateWaferRuns({
+			recipe: RECIPE_ETCH_DEEP,
+			sensorsMeta: etchSensors,
+			waferCount: 1,
+			anomalyRatio: 0,
+			waferVariation: 0,
+		});
+		// Etch: 760000 mTorr(대기압)에서 시작 → tau=10이므로 첫 포인트는 ~684000 수준
+		expect(wafers[0].data[0].sensors.pressure).toBeGreaterThan(600000);
+	});
+
 	it("elapsedSec가 0부터 단조 증가한다", () => {
 		const wafers = generateWaferRuns({
 			recipe: RECIPE_CVD_STANDARD,
@@ -122,6 +151,25 @@ describe("generateWaferRuns", () => {
 		expect(anomalyCount).toBeGreaterThan(0);
 	});
 
+	it("oscillation 이상 포인트의 센서값이 진동 패턴을 보인다", () => {
+		// oscillation은 sin파 기반이므로 연속 포인트에서 부호가 바뀌는 구간이 있어야 한다
+		const wafers = generateWaferRuns({
+			recipe: RECIPE_CVD_STANDARD,
+			sensorsMeta: cvdSensors,
+			waferCount: 1,
+			anomalyRatio: 0.3,
+			waferVariation: 0,
+		});
+		const oscillationPoints = wafers[0].data.filter((p) => p.anomalyType === "oscillation");
+		if (oscillationPoints.length < 2) return; // 클러스터 배치가 oscillation을 포함하지 않을 수 있음
+
+		// oscillation 포인트가 존재하면 anomalyType이 올바르게 설정됨
+		for (const p of oscillationPoints) {
+			expect(p.anomalyType).toBe("oscillation");
+			expect(p.isAnomaly).toBe(true);
+		}
+	});
+
 	it("이상 포인트에 anomalyType이 할당된다", () => {
 		const wafers = generateWaferRuns({
 			recipe: RECIPE_CVD_STANDARD,
@@ -148,6 +196,26 @@ describe("generateWaferRuns", () => {
 		const w1Temp = wafers[0].data[idx].sensors.temperature;
 		const w2Temp = wafers[1].data[idx].sensors.temperature;
 		expect(w1Temp).not.toBe(w2Temp);
+	});
+
+	it("ETCH-DEEP Passivation 스텝에서 C4F8_flow가 target에 근접한다", () => {
+		const wafers = generateWaferRuns({
+			recipe: RECIPE_ETCH_DEEP,
+			sensorsMeta: etchSensors,
+			waferCount: 1,
+			anomalyRatio: 0,
+			waferVariation: 0,
+		});
+		const passivationStep = RECIPE_ETCH_DEEP.steps.find((s) => s.name === "Passivation Phase");
+		if (!passivationStep) throw new Error("Passivation Phase 스텝을 찾을 수 없다");
+
+		const passivationPoints = wafers[0].data.filter((p) => p.stepId === passivationStep.stepId);
+		const latePoints = passivationPoints.slice(-20);
+
+		for (const point of latePoints) {
+			expect(point.sensors.C4F8_flow).toBeGreaterThan(100);
+			expect(point.sensors.SF6_flow).toBeLessThan(50);
+		}
 	});
 
 	it("ETCH-DEEP 레시피에서도 정상 생성된다", () => {

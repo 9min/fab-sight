@@ -128,8 +128,8 @@ export const RECIPE_ETCH_DEEP: Recipe = {
 		{
 			stepId: "etch-deep-s3",
 			stepNumber: 3,
-			name: "Etch Cycle",
-			durationSec: 200,
+			name: "Etch Phase",
+			durationSec: 120,
 			targetParams: {
 				escTemperature: 20,
 				pressure: 30,
@@ -143,6 +143,21 @@ export const RECIPE_ETCH_DEEP: Recipe = {
 		{
 			stepId: "etch-deep-s4",
 			stepNumber: 4,
+			name: "Passivation Phase",
+			durationSec: 80,
+			targetParams: {
+				escTemperature: 20,
+				pressure: 25,
+				sourcePower: 1500,
+				biasPower: 50,
+				SF6_flow: 0,
+				C4F8_flow: 200,
+				Ar_flow: 50,
+			},
+		},
+		{
+			stepId: "etch-deep-s5",
+			stepNumber: 5,
 			name: "Over-etch",
 			durationSec: 45,
 			targetParams: {
@@ -156,8 +171,8 @@ export const RECIPE_ETCH_DEEP: Recipe = {
 			},
 		},
 		{
-			stepId: "etch-deep-s5",
-			stepNumber: 5,
+			stepId: "etch-deep-s6",
+			stepNumber: 6,
 			name: "Vent",
 			durationSec: 30,
 			targetParams: {

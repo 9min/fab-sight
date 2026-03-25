@@ -10,4 +10,19 @@ export default defineConfig({
 			"@": resolve(__dirname, "src"),
 		},
 	},
+	build: {
+		chunkSizeWarningLimit: 1100,
+		rolldownOptions: {
+			output: {
+				codeSplitting: {
+					groups: [
+						{
+							name: "echarts",
+							test: /echarts/,
+						},
+					],
+				},
+			},
+		},
+	},
 });
