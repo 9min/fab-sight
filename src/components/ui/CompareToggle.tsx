@@ -1,3 +1,5 @@
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
+import { ToggleButton } from "@/components/ui/ToggleButton";
 import { useDashboardStore } from "@/stores/useDashboardStore";
 import { useCallback } from "react";
 
@@ -10,17 +12,13 @@ export function CompareToggle() {
 	}, [toggleCompareMode]);
 
 	return (
-		<button
-			type="button"
-			aria-pressed={isCompareMode}
+		<ToggleButton
+			variant="pill"
+			isActive={isCompareMode}
 			onClick={handleClick}
-			className={`rounded px-3 py-1.5 text-sm transition-colors ${
-				isCompareMode
-					? "bg-slate-600 text-slate-100"
-					: "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300"
-			}`}
+			label="Golden Lot 비교"
 		>
-			Golden Lot 비교
-		</button>
+			<InfoTooltip termId="goldenLot" />
+		</ToggleButton>
 	);
 }

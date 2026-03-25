@@ -28,7 +28,7 @@ export function SensorCheckboxGroup({ sensorsMeta }: SensorCheckboxGroupProps) {
 				return (
 					<label
 						key={meta.key}
-						className="flex cursor-pointer items-center gap-2 text-sm text-slate-300"
+						className="flex min-h-[44px] cursor-pointer items-center gap-2 text-sm text-slate-300"
 					>
 						<input
 							type="checkbox"
@@ -38,14 +38,14 @@ export function SensorCheckboxGroup({ sensorsMeta }: SensorCheckboxGroupProps) {
 							aria-label={meta.label}
 						/>
 						<span
-							className={`flex h-4 w-4 items-center justify-center rounded border ${
+							className={`flex h-5 w-5 items-center justify-center rounded border ${
 								checked ? "border-transparent" : "border-slate-500"
 							}`}
 							style={{ backgroundColor: checked ? meta.color : "transparent" }}
 						>
 							{checked && (
 								<svg
-									className="h-3 w-3 text-white"
+									className="h-3.5 w-3.5 text-white"
 									fill="none"
 									viewBox="0 0 24 24"
 									stroke="currentColor"

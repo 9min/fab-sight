@@ -1,4 +1,5 @@
 import { RadarChart } from "@/components/charts/RadarChart";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useProcessData } from "@/hooks/useProcessData";
 import { useDashboardStore } from "@/stores/useDashboardStore";
 import type { SensorMeta } from "@/types/process";
@@ -41,13 +42,7 @@ export function DrilldownPanel({ sensorsMeta }: DrilldownPanelProps) {
 	}, [dataPoint, sensorsMeta]);
 
 	if (!selectedTimestamp || !selectedLotId || !dataPoint) {
-		return (
-			<div className="flex h-full items-center justify-center">
-				<p className="text-sm text-slate-500">
-					차트에서 타임스탬프를 클릭하면 상세 정보를 확인할 수 있습니다
-				</p>
-			</div>
-		);
+		return <EmptyState message="차트에서 타임스탬프를 클릭하면 상세 정보를 확인할 수 있습니다" />;
 	}
 
 	const formattedTime = new Date(dataPoint.timestamp).toLocaleString("ko-KR");
@@ -58,7 +53,7 @@ export function DrilldownPanel({ sensorsMeta }: DrilldownPanelProps) {
 				<h3 className="text-sm font-medium text-slate-300">드릴다운 분석</h3>
 				<span className="text-xs text-slate-500">{formattedTime}</span>
 				{dataPoint.isAnomaly && (
-					<span className="rounded bg-red-900/50 px-2 py-0.5 text-xs text-red-400">
+					<span className="rounded bg-red-900/80 px-2 py-0.5 text-xs text-red-300">
 						이상 감지 (점수: {dataPoint.anomalyScore.toFixed(2)}
 						{dataPoint.anomalyType ? ` / ${dataPoint.anomalyType}` : ""})
 					</span>

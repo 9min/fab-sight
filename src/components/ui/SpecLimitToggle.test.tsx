@@ -11,14 +11,14 @@ describe("SpecLimitToggle", () => {
 
 	it("버튼이 렌더링된다", () => {
 		render(<SpecLimitToggle />);
-		expect(screen.getByLabelText("Spec Limit 표시")).toBeInTheDocument();
+		expect(screen.getByRole("button")).toBeInTheDocument();
 	});
 
 	it("클릭하면 showSpecLimits가 true로 변경된다", async () => {
 		const user = userEvent.setup();
 		render(<SpecLimitToggle />);
 
-		await user.click(screen.getByLabelText("Spec Limit 표시"));
+		await user.click(screen.getByRole("button"));
 		expect(useDashboardStore.getState().showSpecLimits).toBe(true);
 	});
 
@@ -26,7 +26,7 @@ describe("SpecLimitToggle", () => {
 		const user = userEvent.setup();
 		render(<SpecLimitToggle />);
 
-		const btn = screen.getByLabelText("Spec Limit 표시");
+		const btn = screen.getByRole("button");
 		await user.click(btn);
 		await user.click(btn);
 		expect(useDashboardStore.getState().showSpecLimits).toBe(false);

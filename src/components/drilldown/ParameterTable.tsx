@@ -17,7 +17,10 @@ export function ParameterTable({ rows }: ParameterTableProps) {
 			</thead>
 			<tbody>
 				{rows.map((row) => (
-					<tr key={row.sensor} className="border-b border-slate-700/50">
+					<tr
+						key={row.sensor}
+						className="border-b border-slate-700/50 transition-colors hover:bg-slate-700/50"
+					>
 						<td className="px-3 py-2">
 							<span className="flex items-center gap-2">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: row.color }} />
@@ -28,7 +31,7 @@ export function ParameterTable({ rows }: ParameterTableProps) {
 						<td className="px-3 py-2 text-slate-400">{row.unit}</td>
 						<td className="px-3 py-2">
 							{row.status === "anomaly" ? (
-								<span className="rounded bg-red-900/50 px-2 py-0.5 text-xs text-red-400">이상</span>
+								<span className="rounded bg-red-900/80 px-2 py-0.5 text-xs text-red-300">이상</span>
 							) : (
 								<span className="rounded bg-green-900/50 px-2 py-0.5 text-xs text-green-400">
 									정상
