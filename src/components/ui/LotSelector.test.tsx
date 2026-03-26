@@ -9,7 +9,12 @@ const nonGoldenSummaries = MOCK_LOT_SUMMARIES_V3.filter((s) => !s.isGoldenLot);
 
 describe("LotSelector", () => {
 	beforeEach(() => {
-		useDashboardStore.setState({ selectedLotId: null, selectedWaferId: null });
+		useDashboardStore.setState({
+			selectedEquipmentId: null,
+			selectedChamberId: null,
+			selectedLotId: null,
+			selectedWaferId: null,
+		});
 	});
 
 	it("select 요소가 렌더링된다", () => {

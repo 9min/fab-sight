@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { MOCK_LOTS_V3, MOCK_LOT_SUMMARIES_V3 } from "./mockLotsV3";
 
 describe("MOCK_LOTS_V3", () => {
-	it("4개의 Lot이 생성된다", () => {
-		expect(MOCK_LOTS_V3).toHaveLength(4);
+	it("12개의 Lot이 생성된다 (CVD 10 + Etch 2)", () => {
+		expect(MOCK_LOTS_V3).toHaveLength(12);
 	});
 
 	it("각 Lot에 wafers 배열이 존재하고 6개의 Wafer를 포함한다", () => {
@@ -37,6 +37,19 @@ describe("MOCK_LOTS_V3", () => {
 		const recipeNames = MOCK_LOTS_V3.map((lot) => lot.recipeName);
 		expect(recipeNames).toContain("CVD-STANDARD");
 		expect(recipeNames).toContain("ETCH-DEEP");
+	});
+
+	it("모든 Lot에 runNumber가 존재한다", () => {
+		for (const lot of MOCK_LOTS_V3) {
+			expect(lot.runNumber).toBeGreaterThanOrEqual(1);
+		}
+	});
+
+	it("CVD-01 Chamber A에 연속 10개 Run이 존재한다", () => {
+		const cvdChA = MOCK_LOTS_V3.filter((lot) => lot.chamberId === "cvd01-ch-a");
+		expect(cvdChA).toHaveLength(10);
+		const runNumbers = cvdChA.map((l) => l.runNumber).sort((a, b) => a - b);
+		expect(runNumbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 	});
 
 	it("각 Wafer에 data 배열이 비어있지 않다", () => {

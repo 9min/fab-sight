@@ -71,6 +71,31 @@ export interface LotDataV3 {
 	isGoldenLot: boolean;
 	waferCount: number;
 	wafers: WaferRun[];
+	/** 해당 챔버에서의 연속 Run 번호 (R2R 트렌딩용) */
+	runNumber: number;
+}
+
+/** R2R 조정값 (Run-to-Run 피드백 제어) */
+export interface R2RAdjustment {
+	runNumber: number;
+	lotId: string;
+	sensorKey: string;
+	targetSetpoint: number;
+	actualMean: number;
+	/** 다음 Run에 반영할 보정값 */
+	adjustment: number;
+}
+
+/** 공정 결과 메트릭 */
+export interface ProcessResult {
+	lotId: string;
+	runNumber: number;
+	/** 막 두께 (Å, CVD) 또는 식각 깊이 (nm, Etch) */
+	filmThickness: number;
+	/** Wafer 내 균일도 (%) */
+	uniformity: number;
+	/** 결함 수 */
+	defectCount: number;
 }
 
 /** Wafer 단위 공정 실행 데이터 */

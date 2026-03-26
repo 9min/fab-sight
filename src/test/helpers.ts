@@ -57,6 +57,7 @@ export function createMockLotData(overrides: Partial<LotData> = {}): LotData {
 		isGoldenLot: false,
 		waferCount: 1,
 		wafers: [createMockWaferRun()],
+		runNumber: 1,
 		...overrides,
 	};
 }

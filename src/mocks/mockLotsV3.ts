@@ -13,9 +13,16 @@ interface LotConfig {
 	chamberId: string;
 	isGoldenLot: boolean;
 	anomalyRatio: number;
+	runNumber: number;
 }
 
+/**
+ * CVD-01 Chamber A 연속 10 Run 시나리오:
+ * Run #1: Golden Lot (기준), Run #2~4: 안정, Run #5~7: drift 시작, Run #8~10: R2R 보정 후 수렴
+ * + Etch-01 Chamber A 2 Run 추가 (다른 공정 타입 검증용)
+ */
 const LOT_CONFIGS: LotConfig[] = [
+	// CVD-01 Chamber A — 연속 10 Run
 	{
 		lotId: "LOT-GOLDEN-001",
 		recipe: RECIPE_CVD_STANDARD,
@@ -23,6 +30,7 @@ const LOT_CONFIGS: LotConfig[] = [
 		chamberId: "cvd01-ch-a",
 		isGoldenLot: true,
 		anomalyRatio: 0.02,
+		runNumber: 1,
 	},
 	{
 		lotId: "LOT-20240301-A",
@@ -30,23 +38,99 @@ const LOT_CONFIGS: LotConfig[] = [
 		equipmentId: "equip-cvd-01",
 		chamberId: "cvd01-ch-a",
 		isGoldenLot: false,
-		anomalyRatio: 0.08,
+		anomalyRatio: 0.02,
+		runNumber: 2,
 	},
 	{
 		lotId: "LOT-20240301-B",
-		recipe: RECIPE_ETCH_DEEP,
-		equipmentId: "equip-etch-01",
-		chamberId: "etch01-ch-a",
+		recipe: RECIPE_CVD_STANDARD,
+		equipmentId: "equip-cvd-01",
+		chamberId: "cvd01-ch-a",
 		isGoldenLot: false,
-		anomalyRatio: 0.12,
+		anomalyRatio: 0.03,
+		runNumber: 3,
+	},
+	{
+		lotId: "LOT-20240301-C",
+		recipe: RECIPE_CVD_STANDARD,
+		equipmentId: "equip-cvd-01",
+		chamberId: "cvd01-ch-a",
+		isGoldenLot: false,
+		anomalyRatio: 0.03,
+		runNumber: 4,
 	},
 	{
 		lotId: "LOT-20240302-A",
 		recipe: RECIPE_CVD_STANDARD,
 		equipmentId: "equip-cvd-01",
-		chamberId: "cvd01-ch-b",
+		chamberId: "cvd01-ch-a",
+		isGoldenLot: false,
+		anomalyRatio: 0.06,
+		runNumber: 5,
+	},
+	{
+		lotId: "LOT-20240302-B",
+		recipe: RECIPE_CVD_STANDARD,
+		equipmentId: "equip-cvd-01",
+		chamberId: "cvd01-ch-a",
+		isGoldenLot: false,
+		anomalyRatio: 0.1,
+		runNumber: 6,
+	},
+	{
+		lotId: "LOT-20240302-C",
+		recipe: RECIPE_CVD_STANDARD,
+		equipmentId: "equip-cvd-01",
+		chamberId: "cvd01-ch-a",
 		isGoldenLot: false,
 		anomalyRatio: 0.15,
+		runNumber: 7,
+	},
+	{
+		lotId: "LOT-20240303-A",
+		recipe: RECIPE_CVD_STANDARD,
+		equipmentId: "equip-cvd-01",
+		chamberId: "cvd01-ch-a",
+		isGoldenLot: false,
+		anomalyRatio: 0.1,
+		runNumber: 8,
+	},
+	{
+		lotId: "LOT-20240303-B",
+		recipe: RECIPE_CVD_STANDARD,
+		equipmentId: "equip-cvd-01",
+		chamberId: "cvd01-ch-a",
+		isGoldenLot: false,
+		anomalyRatio: 0.06,
+		runNumber: 9,
+	},
+	{
+		lotId: "LOT-20240303-C",
+		recipe: RECIPE_CVD_STANDARD,
+		equipmentId: "equip-cvd-01",
+		chamberId: "cvd01-ch-a",
+		isGoldenLot: false,
+		anomalyRatio: 0.03,
+		runNumber: 10,
+	},
+	// ETCH-01 Chamber A — 2 Run (별도 공정)
+	{
+		lotId: "LOT-ETCH-001",
+		recipe: RECIPE_ETCH_DEEP,
+		equipmentId: "equip-etch-01",
+		chamberId: "etch01-ch-a",
+		isGoldenLot: false,
+		anomalyRatio: 0.08,
+		runNumber: 1,
+	},
+	{
+		lotId: "LOT-ETCH-002",
+		recipe: RECIPE_ETCH_DEEP,
+		equipmentId: "equip-etch-01",
+		chamberId: "etch01-ch-a",
+		isGoldenLot: false,
+		anomalyRatio: 0.12,
+		runNumber: 2,
 	},
 ];
 
@@ -69,6 +153,7 @@ function buildLot(config: LotConfig): LotDataV3 {
 		isGoldenLot: config.isGoldenLot,
 		waferCount: WAFER_COUNT,
 		wafers,
+		runNumber: config.runNumber,
 	};
 }
 
@@ -83,6 +168,7 @@ export interface LotSummaryV3 {
 	chamberId: string;
 	isGoldenLot: boolean;
 	waferCount: number;
+	runNumber: number;
 }
 
 export const MOCK_LOT_SUMMARIES_V3: LotSummaryV3[] = MOCK_LOTS_V3.map((lot) => ({
@@ -92,6 +178,7 @@ export const MOCK_LOT_SUMMARIES_V3: LotSummaryV3[] = MOCK_LOTS_V3.map((lot) => (
 	chamberId: lot.chamberId,
 	isGoldenLot: lot.isGoldenLot,
 	waferCount: lot.waferCount,
+	runNumber: lot.runNumber,
 }));
 
 export { MOCK_EQUIPMENT };

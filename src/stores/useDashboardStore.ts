@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 export type XAxisMode = "wallClock" | "elapsed";
+export type ActiveView = "timeSeries" | "lotTrend";
 
 interface DashboardState {
 	selectedEquipmentId: string | null;
@@ -14,8 +15,16 @@ interface DashboardState {
 	showSpecLimits: boolean;
 	xAxisMode: XAxisMode;
 	selectedTimestamp: string | null;
+	activeView: ActiveView;
+	/** Lot 트렌딩 뷰에서 분석할 단일 센서 */
+	trendSensorKey: string;
+	/** Lot 트렌딩 뷰에서 분석할 레시피 스텝 ID */
+	trendStepId: string | null;
 	isSidebarOpen: boolean;
 
+	setActiveView: (view: ActiveView) => void;
+	setTrendSensorKey: (key: string) => void;
+	setTrendStepId: (stepId: string | null) => void;
 	setSelectedEquipment: (equipmentId: string | null) => void;
 	setSelectedChamber: (chamberId: string | null) => void;
 	setSelectedLot: (lotId: string) => void;
@@ -31,8 +40,8 @@ interface DashboardState {
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
-	selectedEquipmentId: null,
-	selectedChamberId: null,
+	selectedEquipmentId: "equip-cvd-01",
+	selectedChamberId: "cvd01-ch-a",
 	selectedLotId: null,
 	selectedWaferId: null,
 	selectedSensors: ["temperature", "pressure", "rfPower"],
@@ -42,8 +51,14 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 	showSpecLimits: false,
 	xAxisMode: "wallClock",
 	selectedTimestamp: null,
+	activeView: "timeSeries",
+	trendSensorKey: "temperature",
+	trendStepId: null,
 	isSidebarOpen: false,
 
+	setActiveView: (view) => set({ activeView: view }),
+	setTrendSensorKey: (key) => set({ trendSensorKey: key }),
+	setTrendStepId: (stepId) => set({ trendStepId: stepId }),
 	setSelectedEquipment: (equipmentId) =>
 		set({
 			selectedEquipmentId: equipmentId,
