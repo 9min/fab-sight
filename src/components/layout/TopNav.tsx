@@ -1,4 +1,5 @@
 import { MenuIcon } from "@/components/icons";
+import { ViewModeToggle } from "@/components/ui/ViewModeToggle";
 import { useDashboardStore } from "@/stores/useDashboardStore";
 import type { ReactNode } from "react";
 import { useCallback } from "react";
@@ -15,7 +16,7 @@ export function TopNav({ children }: TopNavProps) {
 	}, [toggleSidebar]);
 
 	return (
-		<nav className="flex h-14 items-center justify-between border-b border-slate-700 bg-slate-900 px-4 lg:px-6">
+		<nav className="flex h-14 items-center border-b border-slate-700 bg-slate-900 px-4 lg:px-6">
 			<div className="flex items-center gap-3">
 				<button
 					type="button"
@@ -28,7 +29,10 @@ export function TopNav({ children }: TopNavProps) {
 				<h1 className="text-lg font-semibold text-slate-100">FabSight</h1>
 				<span className="hidden text-xs text-slate-500 sm:inline">AI 공정 분석 대시보드</span>
 			</div>
-			<div className="flex items-center gap-2 overflow-x-auto lg:gap-4">{children}</div>
+			<div className="mx-4 hidden border-l border-slate-700 pl-4 sm:block">
+				<ViewModeToggle />
+			</div>
+			<div className="ml-auto flex items-center gap-2 overflow-x-auto lg:gap-3">{children}</div>
 		</nav>
 	);
 }

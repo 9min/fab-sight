@@ -4,7 +4,8 @@ export type GlossaryCategory =
 	| "sensorMeasurement"
 	| "anomalyDetection"
 	| "compareFeature"
-	| "chartOption";
+	| "chartOption"
+	| "r2rControl";
 
 /** 용어사전 항목 */
 export interface GlossaryTerm {
@@ -29,6 +30,7 @@ export const GLOSSARY_CATEGORIES: Record<GlossaryCategory, string> = {
 	anomalyDetection: "이상 탐지",
 	compareFeature: "비교 기능",
 	chartOption: "차트 옵션",
+	r2rControl: "R2R/APC 제어",
 };
 
 /** 카테고리 표시 순서 */
@@ -38,6 +40,7 @@ export const GLOSSARY_CATEGORY_ORDER: GlossaryCategory[] = [
 	"anomalyDetection",
 	"compareFeature",
 	"chartOption",
+	"r2rControl",
 ];
 
 export const GLOSSARY_TERMS: GlossaryTerm[] = [
@@ -273,6 +276,52 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
 		fullDescription:
 			"여러 센서 중 관심 있는 항목만 선택하여 차트에 표시한다. 각 센서는 고유한 색상과 Y축을 가진다.",
 		category: "chartOption",
+	},
+	// R2R/APC 제어
+	{
+		id: "r2r",
+		term: "R2R (Run-to-Run) 제어",
+		shortDescription: "이전 Run 결과를 반영하여 다음 Run의 공정 조건을 자동 조정하는 피드백 제어",
+		fullDescription:
+			"Run-to-Run 제어는 이전 공정 실행(Run)의 결과를 분석하여 다음 Run의 레시피 setpoint를 자동으로 조정하는 피드백 루프다. 예를 들어 이전 Run에서 막 두께가 target보다 두꺼웠다면, 다음 Run에서 증착 시간이나 온도를 미세 조정한다.",
+		category: "r2rControl",
+		relatedTerms: ["apc", "adjustment"],
+	},
+	{
+		id: "apc",
+		term: "APC (Advanced Process Control)",
+		shortDescription: "데이터/AI 기반 첨단 공정 제어 시스템",
+		fullDescription:
+			"APC는 FDC(이상 탐지)와 R2R(피드백 제어)를 포괄하는 상위 개념이다. 통계적 모델, 머신러닝 등을 활용하여 공정 파라미터를 실시간으로 최적화하고, 공정 안정성과 수율을 극대화한다.",
+		category: "r2rControl",
+		relatedTerms: ["r2r"],
+	},
+	{
+		id: "adjustment",
+		term: "조정값 (Adjustment)",
+		shortDescription: "R2R 제어에서 다음 Run에 반영할 setpoint 보정량",
+		fullDescription:
+			"조정값은 (실제 측정값 - 목표값)을 기반으로 계산된 보정량이다. 양수면 setpoint를 올리고, 음수면 내린다. 이상적인 R2R 제어에서는 조정값이 점차 0에 수렴한다.",
+		category: "r2rControl",
+		relatedTerms: ["r2r", "processResult"],
+	},
+	{
+		id: "processResult",
+		term: "공정 결과 (Process Result)",
+		shortDescription: "공정 완료 후 측정하는 최종 품질 메트릭",
+		fullDescription:
+			"공정 결과는 막 두께(Film Thickness), 균일도(Uniformity), 결함 수(Defect Count) 등 공정 완료 후 측정하는 품질 지표다. R2R 제어의 최종 판단 기준이 된다.",
+		category: "r2rControl",
+		relatedTerms: ["r2r", "adjustment"],
+	},
+	{
+		id: "lotTrending",
+		term: "Lot 트렌딩",
+		shortDescription: "연속 Run의 센서 평균값 변화 추이를 시각화하는 SPC 차트",
+		fullDescription:
+			"Lot 트렌딩은 같은 챔버에서 연속 실행된 여러 Lot의 센서 평균값을 Run 순서대로 표시하는 차트다. drift, shift 등 장기 변동을 파악하는 데 핵심적이며, UCL/LCL 관리 한계선과 ±2σ 경고선을 함께 표시한다.",
+		category: "r2rControl",
+		relatedTerms: ["r2r", "specLimit"],
 	},
 ];
 
