@@ -279,8 +279,8 @@ export function useTodoRealtimeSync() {
 
 ```
 src/stores/
-├── useDashboardStore.ts    # 선택된 Equipment/Chamber/Lot/Wafer, 센서 필터, Compare 모드
-└── useDrilldownStore.ts    # 드릴다운 패널 선택 시점 데이터
+├── useDashboardStore.ts    # 선택된 Equipment/Chamber/Lot/Wafer, 센서 필터, Compare 모드, 뷰 전환
+└── useGlossaryStore.ts     # 용어사전 Drawer 열림 상태, 검색어, 하이라이트 용어
 ```
 
 ```ts
@@ -289,12 +289,18 @@ interface DashboardState {
   selectedEquipmentId: string | null;
   selectedChamberId: string | null;
   selectedLotId: string | null;
-  selectedWaferId: string | null;    // Lot 내 특정 Wafer 선택
-  selectedSensors: string[];         // 동적 센서 키 목록 (공정 종류에 따라 변동)
-  isCompareMode: boolean;            // Golden Lot 비교 모드
-  showAnomalyOverlay: boolean;       // AI 이상탐지 오버레이
-  showSpecLimits: boolean;           // Spec Limit 수평선 표시
-  xAxisMode: "wallClock" | "elapsed"; // X축 모드 (절대 시각 / 경과 시간)
+  selectedWaferId: string | null;       // Lot 내 특정 Wafer 선택
+  selectedSensors: string[];            // 동적 센서 키 목록 (공정 종류에 따라 변동)
+  isCompareMode: boolean;               // Golden Lot 비교 모드
+  isWaferCompareMode: boolean;          // Wafer-to-Wafer 비교 모드
+  showAnomalyOverlay: boolean;          // AI 이상탐지 오버레이
+  showSpecLimits: boolean;              // Spec Limit 수평선 표시
+  xAxisMode: "wallClock" | "elapsed";   // X축 모드 (절대 시각 / 경과 시간)
+  selectedTimestamp: string | null;     // 드릴다운 선택 시점
+  activeView: "timeSeries" | "lotTrend"; // 현재 활성 뷰 (시계열 / Lot 트렌딩)
+  trendSensorKey: string;               // Lot 트렌딩 뷰: 분석할 단일 센서 키
+  trendStepId: string | null;           // Lot 트렌딩 뷰: 분석할 레시피 스텝 ID
+  isSidebarOpen: boolean;               // 모바일 사이드바 열림 상태
 }
 ```
 

@@ -150,8 +150,8 @@ describe("TodoService 보안", () => {
 │   │       ├── DrilldownPanel.test.tsx
 │   │       └── ...
 │   ├── mocks/
-│   │   ├── generateProcessData.ts
-│   │   ├── generateProcessData.test.ts
+│   │   ├── generateProcessDataV3.ts
+│   │   ├── generateProcessDataV3.test.ts
 │   │   └── ...
 │   ├── services/
 │   │   ├── processDataService.ts
@@ -429,10 +429,10 @@ vi.mock("@/lib/supabase", () => ({
 
 ### 모킹 헬퍼 패턴
 
-재사용 가능한 모킹 헬퍼를 `tests/helpers/supabaseMock.ts`에 작성한다.
+재사용 가능한 모킹 헬퍼를 `src/test/helpers.ts`에 작성한다.
 
 ```ts
-// tests/helpers/supabaseMock.ts
+// src/test/helpers.ts
 import { vi } from "vitest";
 import { supabase } from "@/lib/supabase";
 
@@ -457,7 +457,7 @@ export function mockSupabaseSelect<T>(table: string, data: T[], error: null | { 
 사용 예시:
 
 ```ts
-import { mockSupabaseSelect } from "../helpers/supabaseMock";
+import { mockSupabaseSelect } from "@/test/helpers";
 
 it("할 일 목록을 조회한다", async () => {
   const mockTodos = [{ id: "1", title: "테스트", is_completed: false }];
@@ -493,10 +493,10 @@ function mockUnauthenticated() {
 
 ### 테스트 데이터 팩토리
 
-`tests/factories/` 디렉토리에 팩토리 함수를 작성한다.
+`src/test/` 디렉토리에 팩토리 함수를 작성한다.
 
 ```ts
-// tests/factories/todoFactory.ts
+// src/test/todoFactory.ts
 import type { Todo } from "@/types/todo";
 
 export function createTestTodo(overrides: Partial<Todo> = {}): Todo {
