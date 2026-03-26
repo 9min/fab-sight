@@ -19,6 +19,8 @@
 - [ ] **다변량 데이터 드릴다운 인터랙션**: 메인 차트에서 특정 시점 클릭 시, 해당 시점의 모든 센서 값을 방사형 차트(Radar Chart)로 표시하고, 원시 데이터를 테이블로 리스팅.
 - [ ] **공정 비교 화면 (Compare Mode)**: Golden Lot 데이터와 현재 분석 중인 Lot 데이터를 겹쳐서 비교. 토글 활성화 시 Golden Lot이 점선으로 추가 렌더링. 비교는 동일 레시피/스텝 기준으로 elapsed time 축에서 수행한다.
 - [ ] **Wafer-to-Wafer 비교**: 같은 Lot 내 Wafer 간 센서 트렌드를 겹쳐서 비교하여, 이상이 특정 Wafer에 국한되는지 Lot 전체에 해당하는지 판별할 수 있다.
+- [ ] **R2R/APC Lot-to-Lot 트렌딩 뷰**: 챔버별 연속 Run의 특정 센서·스텝 평균값을 시계열로 표시. UCL/LCL 관리 한계선과 ±2σ 통계 밴드를 오버레이하여 공정 드리프트를 조기 감지한다. R2R 조정값(보정량)과 공정 결과 메트릭(막 두께, 균일도, 결함 수)을 하단 패널에 함께 표시하여 APC(Advanced Process Control) 피드백 효과를 확인할 수 있다.
+- [ ] **용어사전 (Glossary)**: 반도체 공정 용어를 인라인 툴팁과 우측 Drawer로 제공. 엔지니어가 대시보드에서 용어를 즉시 확인할 수 있도록 지원한다.
 
 ## 4. 사용자 스토리
 
@@ -163,11 +165,13 @@ export interface ProcessDataPoint {
 
 화면은 SPA 형태로 3개 영역으로 구성:
 
-1. **Top Navigation Bar**: 프로젝트 로고, Equipment/Chamber 선택, Lot 선택, Wafer 선택 Dropdown, Compare Mode Toggle
-2. **Left Sidebar (Filter Panel)**: 센서 선택 체크박스 (공정 종류에 따라 동적), AI 이상 탐지 표시 여부 Toggle, Spec Limit 표시 Toggle, X축 모드 전환 (wall clock / elapsed time)
+1. **Top Navigation Bar**: 프로젝트 로고, Equipment/Chamber 선택, Lot 선택, Wafer 선택 Dropdown, Compare Mode Toggle, 용어사전 버튼. 뷰 모드(시계열/Lot 트렌딩)는 데스크톱에서 TopNav에, 모바일에서는 Sidebar 상단에 표시한다.
+2. **Left Sidebar (Filter Panel)**:
+   - 시계열 뷰: 센서 선택 체크박스 (공정 종류에 따라 동적), AI 이상 탐지 표시 여부 Toggle, Spec Limit 표시 Toggle, Wafer 비교 Toggle, X축 모드 전환 (wall clock / elapsed time)
+   - Lot 트렌딩 뷰: 분석할 단일 센서 선택 드롭다운, 분석할 레시피 스텝 선택 드롭다운
 3. **Main Content Area (Split View)**:
-   - [상단 60%] 메인 시계열 차트 (ECharts, 줌/패닝, 스텝 경계선 표시, Spec Limit 수평선)
-   - [하단 40%] 드릴다운 패널 (좌: Radar Chart / 우: Parameter Data Table)
+   - 시계열 뷰: [상단 60%] 메인 시계열 차트 (ECharts, 줌/패닝, 스텝 경계선 표시, Spec Limit 수평선) / [하단 40%] 드릴다운 패널 (좌: Radar Chart / 우: Parameter Data Table)
+   - Lot 트렌딩 뷰: [상단] Lot-to-Lot 트렌드 차트 (Run별 센서 평균, UCL/LCL, ±2σ 밴드, 공정별 판정 색상) / [하단] R2R 조정값 차트 + 공정 결과 메트릭 테이블
 
 ## 8. 비기능 요구사항
 
@@ -185,6 +189,7 @@ export interface ProcessDataPoint {
 ## 10. 마일스톤
 
 - **v0.1 MVP**: 메인 시계열 대시보드 + AI 이상탐지 시각화 + Mock 데이터 기반 동작
-- **v0.2**: 드릴다운 인터랙션 + 공정 비교 모드
+- **v0.2**: 드릴다운 인터랙션 + 공정 비교 모드 (Golden Lot, Wafer-to-Wafer)
 - **v0.3**: 데이터 모델 고도화 (Lot-Wafer 1:N, Equipment/Chamber, Recipe Step, 동적 센서, Spec Limit, 이상 유형 분류)
+- **v0.4**: R2R/APC Lot-to-Lot 트렌딩 뷰 + 전체 챔버 Mock 데이터 확장 (28 Lots, 5 챔버) + 엔지니어 UX 개선 (센서/스텝 선택, 공정별 판정, 차트 컨텍스트 헤더, 용어사전)
 - **v1.0 정식 출시**: Supabase 연동, 실 데이터 기반 동작, 성능 최적화 완료

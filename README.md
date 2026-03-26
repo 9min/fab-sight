@@ -18,6 +18,7 @@ FabSight는 반도체 장비에서 발생하는 센서 데이터(온도, 압력,
 - **Golden Lot 비교** — 기준이 되는 정상 공정 데이터와 현재 데이터를 겹쳐서 비교
 - **Wafer-to-Wafer 비교** — 같은 로트(제조 단위) 내 웨이퍼 간 균일도 비교
 - **Spec Limit 표시** — 공정 규격 한계선(허용 범위)을 차트에 오버레이
+- **R2R/APC Lot-to-Lot 트렌딩** — 챔버별 연속 Run의 센서 트렌드, R2R 조정값, 공정 결과 메트릭을 한 화면에서 분석. UCL/LCL 및 ±2σ 밴드로 공정 드리프트 조기 감지
 - **용어사전** — 반도체 공정 용어를 인라인 툴팁과 Drawer로 설명
 - **반응형 레이아웃** — 모바일부터 데스크톱까지 대응
 
@@ -95,21 +96,23 @@ pnpm dev
 src/
 ├── app/            # 앱 진입점 (App.tsx)
 ├── components/     # UI 컴포넌트
-│   ├── charts/     #   차트 (TimeSeriesChart, RadarChart)
-│   ├── drilldown/  #   드릴다운 패널
-│   ├── glossary/   #   용어사전
+│   ├── charts/     #   차트 (TimeSeriesChart, RadarChart, LotTrendChart)
+│   ├── drilldown/  #   드릴다운 패널 (DrilldownPanel, ParameterTable)
+│   ├── glossary/   #   용어사전 (GlossaryButton, GlossaryDrawer)
 │   ├── icons/      #   SVG 아이콘
-│   ├── layout/     #   레이아웃 (TopNav, Sidebar, MainContent)
+│   ├── layout/     #   레이아웃 (TopNav, Sidebar, MainContent, DashboardLayout)
+│   ├── r2r/        #   R2R/APC 패널 (R2RAdjustmentPanel, ProcessResultTable)
 │   └── ui/         #   공통 UI (ToggleButton, SegmentedControl 등)
 ├── constants/      # 상수 (센서 설정, 차트 설정, 용어사전)
 ├── hooks/          # 커스텀 훅
-├── lib/            # 라이브러리 설정 (Supabase 클라이언트)
-├── mocks/          # Mock 데이터
-├── pages/          # 페이지 컴포넌트
+├── lib/            # 라이브러리 설정 (Supabase 클라이언트, QueryClient)
+├── mocks/          # Mock 데이터 (28 Lots, 5 챔버)
+├── pages/          # 페이지 컴포넌트 (DashboardPage, LotTrendPage)
 ├── services/       # 비즈니스 로직
-├── stores/         # Zustand 상태 관리
-├── types/          # TypeScript 타입 정의
-└── utils/          # 유틸리티 함수 (다운샘플링 등)
+├── stores/         # Zustand 상태 관리 (useDashboardStore, useGlossaryStore)
+├── test/           # 테스트 설정 및 헬퍼 (setup.ts, helpers.ts)
+├── types/          # TypeScript 타입 정의 (fab.ts, process.ts)
+└── utils/          # 유틸리티 함수 (다운샘플링, lotTrendUtils 등)
 ```
 
 ## 문서
