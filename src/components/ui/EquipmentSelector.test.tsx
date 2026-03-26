@@ -34,7 +34,7 @@ describe("EquipmentSelector", () => {
 		expect(useDashboardStore.getState().selectedEquipmentId).toBe("equip-cvd-01");
 	});
 
-	it("장비 선택 시 하위 선택이 리셋된다", async () => {
+	it("장비 선택 시 첫 번째 챔버가 자동 선택되고 Lot/Wafer는 리셋된다", async () => {
 		useDashboardStore.setState({
 			selectedChamberId: "ch-old",
 			selectedLotId: "lot-old",
@@ -46,7 +46,7 @@ describe("EquipmentSelector", () => {
 		await user.selectOptions(screen.getByLabelText("장비 선택"), "equip-cvd-01");
 
 		const state = useDashboardStore.getState();
-		expect(state.selectedChamberId).toBeNull();
+		expect(state.selectedChamberId).toBe("cvd01-ch-a");
 		expect(state.selectedLotId).toBeNull();
 		expect(state.selectedWaferId).toBeNull();
 	});

@@ -1,3 +1,4 @@
+import { MOCK_EQUIPMENT } from "@/mocks/equipment";
 import { create } from "zustand";
 
 export type XAxisMode = "wallClock" | "elapsed";
@@ -59,13 +60,16 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 	setActiveView: (view) => set({ activeView: view }),
 	setTrendSensorKey: (key) => set({ trendSensorKey: key }),
 	setTrendStepId: (stepId) => set({ trendStepId: stepId }),
-	setSelectedEquipment: (equipmentId) =>
+	setSelectedEquipment: (equipmentId) => {
+		const equip = MOCK_EQUIPMENT.find((e) => e.equipmentId === equipmentId);
+		const firstChamberId = equip?.chambers[0]?.chamberId ?? null;
 		set({
 			selectedEquipmentId: equipmentId,
-			selectedChamberId: null,
+			selectedChamberId: firstChamberId,
 			selectedLotId: null,
 			selectedWaferId: null,
-		}),
+		});
+	},
 	setSelectedChamber: (chamberId) =>
 		set({ selectedChamberId: chamberId, selectedLotId: null, selectedWaferId: null }),
 	setSelectedLot: (lotId) =>

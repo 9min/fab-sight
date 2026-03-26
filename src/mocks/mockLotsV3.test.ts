@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { MOCK_LOTS_V3, MOCK_LOT_SUMMARIES_V3 } from "./mockLotsV3";
 
 describe("MOCK_LOTS_V3", () => {
-	it("12개의 Lot이 생성된다 (CVD 10 + Etch 2)", () => {
-		expect(MOCK_LOTS_V3).toHaveLength(12);
+	it("28개의 Lot이 생성된다 (CVD-A 10 + CVD-B 5 + CVD-C 3 + Etch-A 6 + Etch-B 4)", () => {
+		expect(MOCK_LOTS_V3).toHaveLength(28);
 	});
 
 	it("각 Lot에 wafers 배열이 존재하고 6개의 Wafer를 포함한다", () => {
@@ -50,6 +50,34 @@ describe("MOCK_LOTS_V3", () => {
 		expect(cvdChA).toHaveLength(10);
 		const runNumbers = cvdChA.map((l) => l.runNumber).sort((a, b) => a - b);
 		expect(runNumbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+	});
+
+	it("CVD-01 Chamber B에 5개 Run이 존재한다", () => {
+		const lots = MOCK_LOTS_V3.filter((lot) => lot.chamberId === "cvd01-ch-b");
+		expect(lots).toHaveLength(5);
+	});
+
+	it("CVD-01 Chamber C에 3개 Run이 존재한다", () => {
+		const lots = MOCK_LOTS_V3.filter((lot) => lot.chamberId === "cvd01-ch-c");
+		expect(lots).toHaveLength(3);
+	});
+
+	it("ETCH-01 Chamber A에 6개 Run이 존재한다", () => {
+		const lots = MOCK_LOTS_V3.filter((lot) => lot.chamberId === "etch01-ch-a");
+		expect(lots).toHaveLength(6);
+	});
+
+	it("ETCH-01 Chamber B에 4개 Run이 존재한다", () => {
+		const lots = MOCK_LOTS_V3.filter((lot) => lot.chamberId === "etch01-ch-b");
+		expect(lots).toHaveLength(4);
+	});
+
+	it("모든 장비/챔버 조합에 Lot 데이터가 존재한다", () => {
+		const chamberIds = ["cvd01-ch-a", "cvd01-ch-b", "cvd01-ch-c", "etch01-ch-a", "etch01-ch-b"];
+		for (const chamberId of chamberIds) {
+			const lots = MOCK_LOTS_V3.filter((lot) => lot.chamberId === chamberId);
+			expect(lots.length).toBeGreaterThan(0);
+		}
 	});
 
 	it("각 Wafer에 data 배열이 비어있지 않다", () => {

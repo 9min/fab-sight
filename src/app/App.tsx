@@ -21,7 +21,11 @@ import { queryClient } from "@/lib/queryClient";
 import { MOCK_RECIPES } from "@/mocks/recipes";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { LotTrendPage } from "@/pages/LotTrendPage";
-import { getProcessResults, getR2RAdjustments } from "@/services/processDataServiceV3";
+import {
+	getLotsByChamber,
+	getProcessResults,
+	getR2RAdjustments,
+} from "@/services/processDataServiceV3";
 import { useDashboardStore } from "@/stores/useDashboardStore";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -42,14 +46,26 @@ function AppContent() {
 		[selectedChamberId],
 	);
 
-	const sensorsMeta = useMemo(() => {
+	/** 시계열 뷰: 선택된 Lot 기준 센서 목록 */
+	const timeSeriesSensorsMeta = useMemo(() => {
 		if (!lotData) return [];
 		const recipe = MOCK_RECIPES.find((r) => r.recipeId === lotData.recipeId);
 		if (!recipe) return [];
 		return getSensorsForProcess(recipe.processType);
 	}, [lotData]);
 
+	/** Lot 트렌딩 뷰: 선택된 챔버의 첫 Lot 레시피 기준 센서 목록 */
+	const trendSensorsMeta = useMemo(() => {
+		if (!selectedChamberId) return [];
+		const chamberLots = getLotsByChamber(selectedChamberId);
+		if (chamberLots.length === 0) return [];
+		const recipe = MOCK_RECIPES.find((r) => r.recipeId === chamberLots[0].recipeId);
+		if (!recipe) return [];
+		return getSensorsForProcess(recipe.processType);
+	}, [selectedChamberId]);
+
 	const isTimeSeries = activeView === "timeSeries";
+	const sensorsMeta = isTimeSeries ? timeSeriesSensorsMeta : trendSensorsMeta;
 
 	return (
 		<>
