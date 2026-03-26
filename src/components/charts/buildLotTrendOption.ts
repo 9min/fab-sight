@@ -23,6 +23,17 @@ export function buildLotTrendOption(
 	const { grandMean, sigma } = calculateTrendStats(trendData);
 	const specLimits = sensorMeta.specLimits;
 
+	/** 센서 데이터 + markLine을 포함한 Y축 범위 계산 */
+	const allSensorValues = trendData.flatMap((p) => [p.mean, p.min, p.max]);
+	if (specLimits?.ucl !== undefined) allSensorValues.push(specLimits.ucl);
+	if (specLimits?.lcl !== undefined) allSensorValues.push(specLimits.lcl);
+	if (sigma > 0) {
+		allSensorValues.push(grandMean + 2.5 * sigma, grandMean - 2.5 * sigma);
+	}
+	const sensorMin = Math.min(...allSensorValues);
+	const sensorMax = Math.max(...allSensorValues);
+	const sensorRange = sensorMax - sensorMin || 1;
+
 	const yAxes: EChartsOption["yAxis"] = [
 		{
 			type: "value",
@@ -31,10 +42,16 @@ export function buildLotTrendOption(
 			axisLine: { show: true, lineStyle: { color: sensorMeta.color } },
 			axisLabel: { color: "#94A3B8", fontSize: 10 },
 			splitLine: { lineStyle: { color: "#334155" } },
+			min: Math.floor(sensorMin - sensorRange * 0.15),
+			max: Math.ceil(sensorMax + sensorRange * 0.15),
 		},
 	];
 
 	if (resultData && resultData.length > 0) {
+		const resultValues = resultData.map((p) => p.value);
+		const resultMin = Math.min(...resultValues);
+		const resultMax = Math.max(...resultValues);
+		const resultRange = resultMax - resultMin || 1;
 		yAxes.push({
 			type: "value",
 			name: resultLabel ?? "결과",
@@ -43,6 +60,8 @@ export function buildLotTrendOption(
 			axisLine: { show: true, lineStyle: { color: "#8B5CF6" } },
 			axisLabel: { color: "#94A3B8", fontSize: 10 },
 			splitLine: { show: false },
+			min: Math.floor(resultMin - resultRange * 0.5),
+			max: Math.ceil(resultMax + resultRange * 0.3),
 		});
 	}
 
@@ -87,8 +106,9 @@ export function buildLotTrendOption(
 			type: "bar",
 			yAxisIndex: 1,
 			data: resultData.map((p) => p.value),
-			itemStyle: { color: "#8B5CF6", opacity: 0.4 },
-			barWidth: "40%",
+			itemStyle: { color: "#8B5CF6", opacity: 0.15 },
+			barWidth: "35%",
+			z: 0,
 		});
 	}
 

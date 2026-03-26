@@ -27,6 +27,7 @@ import {
 	getR2RAdjustments,
 } from "@/services/processDataServiceV3";
 import { useDashboardStore } from "@/stores/useDashboardStore";
+import type { Recipe } from "@/types/fab";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -35,6 +36,9 @@ function AppContent() {
 	const selectedChamberId = useDashboardStore((s) => s.selectedChamberId);
 	const activeView = useDashboardStore((s) => s.activeView);
 	const trendSensorKey = useDashboardStore((s) => s.trendSensorKey);
+	const trendStepId = useDashboardStore((s) => s.trendStepId);
+	const setTrendSensorKey = useDashboardStore((s) => s.setTrendSensorKey);
+	const setTrendStepId = useDashboardStore((s) => s.setTrendStepId);
 	const { data: lotData } = useProcessData(selectedLotId);
 
 	const r2rAdjustments = useMemo(
@@ -54,15 +58,19 @@ function AppContent() {
 		return getSensorsForProcess(recipe.processType);
 	}, [lotData]);
 
-	/** Lot 트렌딩 뷰: 선택된 챔버의 첫 Lot 레시피 기준 센서 목록 */
-	const trendSensorsMeta = useMemo(() => {
-		if (!selectedChamberId) return [];
+	/** Lot 트렌딩 뷰: 선택된 챔버의 레시피 */
+	const trendRecipe: Recipe | undefined = useMemo(() => {
+		if (!selectedChamberId) return undefined;
 		const chamberLots = getLotsByChamber(selectedChamberId);
-		if (chamberLots.length === 0) return [];
-		const recipe = MOCK_RECIPES.find((r) => r.recipeId === chamberLots[0].recipeId);
-		if (!recipe) return [];
-		return getSensorsForProcess(recipe.processType);
+		if (chamberLots.length === 0) return undefined;
+		return MOCK_RECIPES.find((r) => r.recipeId === chamberLots[0].recipeId);
 	}, [selectedChamberId]);
+
+	/** Lot 트렌딩 뷰: 센서 목록 */
+	const trendSensorsMeta = useMemo(() => {
+		if (!trendRecipe) return [];
+		return getSensorsForProcess(trendRecipe.processType);
+	}, [trendRecipe]);
 
 	const isTimeSeries = activeView === "timeSeries";
 	const sensorsMeta = isTimeSeries ? timeSeriesSensorsMeta : trendSensorsMeta;
@@ -114,17 +122,48 @@ function AppContent() {
 							</div>
 						</>
 					) : (
-						<div>
+						<>
 							<div className="mb-4 sm:hidden">
 								<ViewModeToggle />
 							</div>
-							<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
-								R2R 트렌딩 설정
-							</h2>
-							<p className="text-xs text-slate-500">
-								장비/챔버를 선택하면 해당 챔버의 연속 Run 트렌드를 확인할 수 있습니다.
-							</p>
-						</div>
+							<div>
+								<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+									분석 센서
+								</h2>
+								<select
+									value={trendSensorKey}
+									onChange={(e) => setTrendSensorKey(e.target.value)}
+									disabled={trendSensorsMeta.length === 0}
+									className="w-full rounded border border-slate-600 bg-slate-700 px-3 py-1.5 text-sm text-slate-100 focus:border-blue-500 focus:outline-none disabled:opacity-50"
+									aria-label="트렌딩 센서 선택"
+								>
+									{trendSensorsMeta.map((s) => (
+										<option key={s.key} value={s.key}>
+											{s.label} ({s.unit})
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="border-t border-slate-700 pt-4">
+								<h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+									분석 스텝
+								</h2>
+								<select
+									value={trendStepId ?? ""}
+									onChange={(e) => setTrendStepId(e.target.value || null)}
+									disabled={!trendRecipe}
+									className="w-full rounded border border-slate-600 bg-slate-700 px-3 py-1.5 text-sm text-slate-100 focus:border-blue-500 focus:outline-none disabled:opacity-50"
+									aria-label="레시피 스텝 선택"
+								>
+									<option value="">자동 (메인 스텝)</option>
+									{trendRecipe?.steps.map((step) => (
+										<option key={step.stepId} value={step.stepId}>
+											{step.stepNumber}. {step.name} ({step.durationSec}s)
+										</option>
+									))}
+								</select>
+							</div>
+						</>
 					)
 				}
 				chartArea={isTimeSeries ? <DashboardPage /> : <LotTrendPage />}
